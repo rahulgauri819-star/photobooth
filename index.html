@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
 <meta name="apple-mobile-web-app-title" content="SnapBooth">
 <title>SnapBooth — Event Photo Booth</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
 :root {
   --bg: #080a0f;
@@ -1163,17 +1163,36 @@ async function startCamera(videoEl) {
   try {
     if (state.cameraStream) {
       state.cameraStream.getTracks().forEach(t => t.stop());
+      state.cameraStream = null;
     }
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: state.facingMode, width:{ ideal:1920 }, height:{ ideal:1080 } },
+    // Safari iOS works best with simple constraints
+    const constraints = {
+      video: { facingMode: state.facingMode },
       audio: false
-    });
+    };
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
     state.cameraStream = stream;
     videoEl.srcObject = stream;
+    // Safari iOS requires explicit play() call
+    videoEl.setAttribute('autoplay', '');
+    videoEl.setAttribute('playsinline', '');
+    videoEl.setAttribute('muted', '');
+    videoEl.muted = true;
+    try { await videoEl.play(); } catch(pe) {}
     return true;
   } catch(e) {
-    showToast('📷 Camera access denied. Please allow camera.', 'info');
-    return false;
+    // Fallback: try without facingMode
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      state.cameraStream = stream;
+      videoEl.srcObject = stream;
+      videoEl.muted = true;
+      try { await videoEl.play(); } catch(pe) {}
+      return true;
+    } catch(e2) {
+      showToast('📷 Camera error: ' + e2.message, 'info');
+      return false;
+    }
   }
 }
 
@@ -1207,8 +1226,11 @@ async function startCapture() {
     badge.style.display = 'block';
   } else badge.style.display = 'none';
 
-  await startCamera(document.getElementById('camera-video'));
-  applyVideoFilter();
+  // Small delay so Safari renders the screen before camera attaches
+  await new Promise(r => setTimeout(r, 150));
+  const videoEl = document.getElementById('camera-video');
+  const ok = await startCamera(videoEl);
+  if (ok) applyVideoFilter();
 }
 
 function applyVideoFilter() {
