@@ -10,131 +10,129 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font-family:-apple-system,'Helvetica Neue',sans-serif}
-
-/* ── SCREENS ── */
-.screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;flex-direction:column;overflow:hidden}
+.screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;flex-direction:column;overflow:hidden;background:#0a0c12}
 .screen.active{display:flex}
 
-/* ── ATTRACT ── */
-#s-attract{background:radial-gradient(ellipse at 35% 25%,#1a2040 0%,#080a0f 65%);align-items:center;justify-content:center;cursor:pointer;text-align:center;padding:40px 30px}
-.logo{font-size:clamp(56px,13vw,120px);font-weight:900;letter-spacing:.04em;line-height:1;background:linear-gradient(135deg,#c8f135,#7b61ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 30px rgba(200,241,53,.3));margin-bottom:10px}
-.sub{font-size:clamp(12px,2vw,16px);color:#8a92a8;letter-spacing:.25em;text-transform:uppercase;margin-bottom:44px}
-.tapbtn{display:inline-block;padding:16px 40px;background:#c8f135;color:#080a0f;border-radius:100px;font-size:16px;font-weight:800;animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(200,241,53,.4)}50%{box-shadow:0 0 0 16px rgba(200,241,53,0)}}
+/* ── SHARED ── */
+.hdr{padding:max(env(safe-area-inset-top),44px) 18px 14px;display:flex;align-items:center;gap:12px;background:#0a0c12;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.hdr h1{font-size:22px;font-weight:800;flex:1}
+.hdr p{font-size:11px;color:#8a92a8;margin-top:2px}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px 100px}
+.back{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.primary{width:100%;padding:14px;background:#e8356d;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:14px}
+.primary:active{opacity:.85}
+.secondary{width:100%;padding:13px;background:transparent;color:#e8356d;border:2px solid #e8356d;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px}
+.card{background:#141820;border-radius:14px;border:1px solid rgba(255,255,255,.07);overflow:hidden;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:700;color:#e8356d;padding:14px 14px 0;margin-bottom:10px}
+.row{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer}
+.row:last-child{border-bottom:none}
+.row:active{background:rgba(255,255,255,.03)}
+.rl{font-size:13px;font-weight:600}
+.rsd{font-size:11px;color:#8a92a8;margin-top:2px}
+.ra{color:#8a92a8;font-size:13px}
+.tog{width:44px;height:26px;border-radius:13px;background:#2a3040;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.tog.on{background:#e8356d}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.tog.on::after{transform:translateX(18px)}
+.sect{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#4a5268;font-weight:700;margin:16px 0 6px;padding:0 2px}
+.chip-row{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:7px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:#141820;color:#8a92a8;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.chip.sel{background:rgba(232,53,109,.15);border-color:#e8356d;color:#e8356d}
 
-/* ── SHARED PAGE STYLES ── */
-.page{background:#0a0c12;overflow:hidden}
-.page-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 20px 100px}
-.hdr{padding:50px 20px 16px;display:flex;align-items:center;gap:12px;background:#0a0c12;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
-.hdr h1{font-size:24px;font-weight:800;letter-spacing:-.3px}
-.hdr p{font-size:12px;color:#8a92a8;margin-top:2px}
-.back{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.primary{width:100%;padding:15px;background:#c8f135;color:#080a0f;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:16px}
-.primary:active{opacity:.85;transform:scale(.98)}
+/* ── HOME (EVENTS) ── */
+#s-home{background:#0a0c12}
+.events-split{display:flex;flex:1;overflow:hidden}
+.events-list{width:44%;border-right:1px solid rgba(255,255,255,.07);overflow-y:auto;padding:10px 0}
+.ev-item{padding:14px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .15s}
+.ev-item:active{background:rgba(255,255,255,.04)}
+.ev-item.sel{border-left-color:#e8356d;background:rgba(232,53,109,.06)}
+.ev-item h3{font-size:13px;font-weight:700}
+.ev-item p{font-size:11px;color:#8a92a8;margin-top:2px}
+.events-detail{flex:1;overflow-y:auto;padding:14px}
+.detail-section{margin-bottom:16px}
+.detail-section h4{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#8a92a8;margin-bottom:8px;font-weight:700}
+.det-row{font-size:12px;color:#ccc;padding:3px 0;display:flex;align-items:center;gap:6px}
+.det-row .chk{color:#e8356d;font-size:14px}
+.start-preview{border-radius:10px;overflow:hidden;aspect-ratio:9/16;max-height:160px;margin-bottom:12px;position:relative}
+.mode-icons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mode-icon-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px;background:#141820;border-radius:10px;font-size:10px;color:#8a92a8;cursor:pointer;transition:all .15s}
+.mode-icon-item:active{background:#1e2530}
+.mode-icon-item svg{width:26px;height:26px;color:#e8356d}
+.launch-btn{background:#e8356d;color:#fff;border:none;border-radius:12px;padding:13px;width:100%;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px}
+.new-btn{background:transparent;color:#e8356d;border:2px solid #e8356d;border-radius:12px;padding:11px;width:100%;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.copy-link{font-size:12px;color:#e8356d;text-align:right;cursor:pointer;margin-bottom:10px;padding:4px 0}
+.gear-btn{position:absolute;bottom:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(232,53,109,.15);border:none;color:#e8356d;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.gear-btn svg{width:20px;height:20px}
 
-/* ── MODE ── */
-.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mcard{background:#141820;border:2px solid rgba(255,255,255,.07);border-radius:14px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .15s}
-.mcard:active{transform:scale(.96)}
-.mcard.sel{border-color:#c8f135;background:rgba(200,241,53,.06)}
-.mic{font-size:30px;margin-bottom:7px}
-.mcard h3{font-size:13px;font-weight:700}
-.mcard p{font-size:11px;color:#8a92a8;margin-top:2px;line-height:1.3}
+/* ── WELCOME EDITOR ── */
+#s-welcome{background:#0a0c12}
+.welcome-preview{flex-shrink:0;height:38vh;position:relative;overflow:hidden;margin:12px 16px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.welcome-preview .wp-bg{position:absolute;inset:0;background:linear-gradient(135deg,#667eea,#764ba2)}
+.welcome-preview .wp-content{position:relative;z-index:1;text-align:center;padding:20px}
+.welcome-preview .wp-logo{width:60px;height:60px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:24px}
+.welcome-preview .wp-title{font-size:18px;font-weight:800;color:#fff}
+.welcome-preview .wp-sub{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px}
+.welcome-preview .wp-btn{margin-top:14px;background:#fff;color:#764ba2;border:none;border-radius:20px;padding:8px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.tool-bar{display:flex;gap:8px;overflow-x:auto;padding:10px 16px;scrollbar-width:none;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.07)}
+.tool-bar::-webkit-scrollbar{display:none}
+.tool-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 12px;background:#141820;border-radius:10px;border:none;color:#8a92a8;cursor:pointer;font-family:inherit;font-size:10px;transition:all .15s;min-width:56px}
+.tool-btn:active{background:#1e2530;color:#e8356d}
+.tool-btn svg{width:22px;height:22px}
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 16px}
+.theme-card{aspect-ratio:9/16;border-radius:10px;cursor:pointer;border:3px solid transparent;transition:all .15s;overflow:hidden;position:relative}
+.theme-card.sel{border-color:#e8356d}
+.theme-card span{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 
-/* ── LAYOUT ── */
-.lgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.lcard{background:#141820;border:2px solid rgba(255,255,255,.07);border-radius:11px;padding:12px 7px;text-align:center;cursor:pointer;transition:all .15s}
-.lcard:active{transform:scale(.96)}
-.lcard.sel{border-color:#c8f135;background:rgba(200,241,53,.06)}
-.lprev{display:flex;gap:3px;justify-content:center;align-items:center;height:46px;margin-bottom:6px}
-.lb{background:#2a3040;border-radius:3px;border:1px solid rgba(255,255,255,.07)}
-.lcard h4{font-size:11px;font-weight:700}
-.lcard small{font-size:10px;color:#8a92a8}
+/* ── PHOTO LAYOUT EDITOR ── */
+#s-layout-editor{background:#0a0c12}
+.layout-canvas{flex-shrink:0;margin:12px 16px;border-radius:12px;overflow:hidden;position:relative;background:#1e2530}
+.layout-canvas-inner{width:100%;aspect-ratio:4/3;position:relative;display:flex;align-items:center;justify-content:center}
+.photo-slot{position:absolute;background:#2a3040;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#4a5268;font-size:20px;font-weight:900;border:2px dashed rgba(255,255,255,.1)}
+.layout-tools{display:flex;gap:8px;overflow-x:auto;padding:10px 16px;scrollbar-width:none;flex-shrink:0}
+.layout-tools::-webkit-scrollbar{display:none}
+.layout-presets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 14px}
+.preset-card{background:#141820;border:2px solid rgba(255,255,255,.07);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .15s}
+.preset-card.sel{border-color:#e8356d;background:rgba(232,53,109,.06)}
+.preset-card h4{font-size:11px;font-weight:700}
+.preset-card small{font-size:9px;color:#8a92a8}
+.preset-prev{display:flex;gap:2px;justify-content:center;align-items:center;height:40px;margin-bottom:5px}
+.ppb{background:#2a3040;border-radius:2px;border:1px solid rgba(255,255,255,.07)}
 
-/* ── FILTER ── */
-.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.fcard{border:2px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .15s}
-.fcard:active{transform:scale(.96)}
-.fcard.sel{border-color:#c8f135}
-.fprev{aspect-ratio:4/3;background:#1e2530;display:flex;align-items:center;justify-content:center;font-size:22px}
-.fname{padding:6px;text-align:center;font-size:10px;font-weight:600;background:#141820}
-
-/* ════════════════════════════════════════
-   CAMERA SCREEN — THE WORKING APPROACH
-   Based on what the diagnostic confirmed:
-   video plays fine when it's the direct child
-   and always visible in the DOM.
-   ════════════════════════════════════════ */
-#s-camera{
-  /* black background while camera loads */
-  background:#000;
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  overflow:hidden;
-}
-
-/* Video: full screen, always in DOM, never hidden */
-#cam-vid{
-  position:absolute;
-  top:0;left:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  background:#000;
-  z-index:1;
-  /* NEVER set display:none or visibility:hidden on this element */
-}
-
-/* UI overlay */
-#cam-overlay{
-  position:absolute;
-  top:0;left:0;
-  width:100%;height:100%;
-  z-index:2;
-  display:flex;
-  flex-direction:column;
-  background:linear-gradient(to bottom,
-    rgba(0,0,0,.55) 0%,
-    transparent 22%,
-    transparent 74%,
-    rgba(0,0,0,.72) 100%);
-  pointer-events:none;
-}
-#cam-overlay>*{pointer-events:auto}
-
-.cam-top{padding:env(safe-area-inset-top,16px) 16px 0;padding-top:max(env(safe-area-inset-top),16px);display:flex;align-items:center;justify-content:space-between}
-.cam-bot{margin-top:auto;padding:0 16px max(env(safe-area-inset-bottom),20px);padding-bottom:max(env(safe-area-inset-bottom),20px);display:flex;align-items:center;justify-content:center;gap:24px}
+/* ── CAMERA ── */
+#s-camera{background:#000;position:fixed;top:0;left:0;width:100%;height:100%;overflow:hidden}
+#cam-vid{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;background:#000;z-index:1}
+#cam-ui{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;display:flex;flex-direction:column;background:linear-gradient(to bottom,rgba(0,0,0,.55) 0%,transparent 22%,transparent 74%,rgba(0,0,0,.72) 100%);pointer-events:none}
+#cam-ui>*{pointer-events:auto}
+.cam-top{padding:max(env(safe-area-inset-top),16px) 16px 0;display:flex;align-items:center;justify-content:space-between}
+.cam-bot{margin-top:auto;padding:0 16px max(env(safe-area-inset-bottom),20px);display:flex;align-items:center;justify-content:center;gap:24px}
 .icb{width:46px;height:46px;border-radius:50%;border:none;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.icb:active{transform:scale(.9);background:rgba(255,255,255,.28)}
+.icb:active{transform:scale(.9)}
 .shutter{width:76px;height:76px;border-radius:50%;background:transparent;border:4px solid #fff;cursor:pointer;position:relative;flex-shrink:0}
 .shutter::after{content:'';position:absolute;inset:6px;border-radius:50%;background:#fff}
 .shutter:active{transform:scale(.92)}
 .shutter:disabled{opacity:.35}
 .sdots{display:flex;gap:7px}
 .sd{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .3s}
-.sd.done{background:#c8f135;box-shadow:0 0 6px #c8f135}
+.sd.done{background:#e8356d;box-shadow:0 0 6px #e8356d}
 .sd.cur{background:#fff}
 .strip-row{display:flex;gap:5px;overflow-x:auto;padding:0 14px 6px;scrollbar-width:none;flex-shrink:0}
 .strip-row::-webkit-scrollbar{display:none}
 .sth{width:52px;flex-shrink:0;aspect-ratio:3/4;border-radius:5px;overflow:hidden;border:2px solid rgba(255,255,255,.22)}
 .sth img{width:100%;height:100%;object-fit:cover}
-
-/* countdown */
 #cdwrap{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.3)}
 #cdwrap.on{display:flex}
-#cdnum{font-size:min(240px,45vw);font-weight:900;color:#fff;line-height:1;animation:cpop .9s ease-out;text-shadow:0 0 40px rgba(200,241,53,.5)}
+#cdnum{font-size:min(240px,45vw);font-weight:900;color:#fff;line-height:1;animation:cpop .9s ease-out;text-shadow:0 0 40px rgba(232,53,109,.5)}
 @keyframes cpop{0%{transform:scale(2.2);opacity:0}25%{transform:scale(1);opacity:1}85%{opacity:1}100%{opacity:0;transform:scale(.85)}}
-/* flash */
 #flash{position:absolute;top:0;left:0;width:100%;height:100%;z-index:20;background:#fff;display:none;pointer-events:none}
+.mode-pill{position:absolute;top:max(env(safe-area-inset-top),16px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:6px 16px;font-size:11px;font-weight:700;color:#fff;z-index:5;pointer-events:none}
 
 /* ── REVIEW ── */
 #s-review{background:#000;position:fixed;top:0;left:0;width:100%;height:100%}
 #rev-canvas{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:1}
-#rev-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;display:flex;flex-direction:column;background:linear-gradient(to bottom,rgba(0,0,0,.6) 0%,transparent 18%,transparent 68%,rgba(0,0,0,.92) 100%)}
+#rev-ui{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;display:flex;flex-direction:column;background:linear-gradient(to bottom,rgba(0,0,0,.6) 0%,transparent 18%,transparent 68%,rgba(0,0,0,.92) 100%)}
 .rev-top{padding:max(env(safe-area-inset-top),16px) 16px 0;display:flex;align-items:center;gap:12px;padding-top:max(env(safe-area-inset-top),16px)}
-.rev-title{font-size:19px;font-weight:800}
-.rev-bot{margin-top:auto;padding:14px 14px max(env(safe-area-inset-bottom),14px)}
+.rev-title{font-size:18px;font-weight:800}
+.rev-bot{margin-top:auto;padding:12px 12px max(env(safe-area-inset-bottom),12px)}
 .srow{display:flex;gap:7px;margin-bottom:9px}
 .sbtn{flex:1;padding:12px 4px;border-radius:10px;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:700;font-family:inherit;transition:all .15s}
 .sbtn:active{transform:scale(.93)}
@@ -143,8 +141,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 .s-save{background:#34c759;color:#fff}
 .s-print{background:#ff9f0a;color:#fff}
 .s-qr{background:#1e2530;color:#fff;border:1px solid rgba(255,255,255,.1)}
+.s-wa{background:#25d366;color:#fff}
 .btn-ret{width:100%;padding:13px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;font-family:inherit}
-.btn-new{width:100%;padding:14px;background:#c8f135;color:#080a0f;border:none;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+.btn-new{width:100%;padding:14px;background:#e8356d;color:#fff;border:none;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
 
 /* ── GALLERY ── */
 .ggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
@@ -153,41 +152,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 .gi:active img{opacity:.8}
 .gempty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#8a92a8;padding:50px;text-align:center}
 
-/* ── SETTINGS ── */
-.sg{background:#141820;border-radius:11px;border:1px solid rgba(255,255,255,.07);margin-bottom:2px;overflow:hidden}
-.si{padding:13px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07);cursor:pointer}
-.si:last-child{border-bottom:none}
-.si:active{background:#1e2530}
-.sl{font-size:13px;font-weight:600}
-.sd2{font-size:11px;color:#8a92a8;margin-top:1px}
-.st{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#4a5268;font-weight:700;margin:16px 0 6px}
-.tog{width:44px;height:26px;border-radius:13px;background:#2a3040;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
-.tog.on{background:#c8f135}
-.tog::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
-.tog.on::after{transform:translateX(18px)}
-.trow{display:flex;gap:5px}
-.topt{flex:1;padding:8px 2px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:#141820;color:#8a92a8;font-size:12px;font-weight:700;cursor:pointer;text-align:center;font-family:inherit}
-.topt.sel{background:rgba(200,241,53,.1);border-color:#c8f135;color:#c8f135}
-.crow{display:flex;gap:7px;flex-wrap:wrap}
-.co{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
-.co.sel{border-color:#fff;transform:scale(1.2)}
-.upz{border:2px dashed rgba(255,255,255,.1);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:#141820;margin-bottom:3px}
-.upz p{color:#8a92a8;font-size:11px;margin-top:5px}
-.fthumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.fth{width:56px;height:56px;border-radius:7px;object-fit:cover;border:2px solid rgba(255,255,255,.1);cursor:pointer}
-.fth.sel{border-color:#c8f135}
+/* ── PRINT SETTINGS ── */
+.num-row{display:flex;align-items:center;gap:10px}
+.num-btn{width:30px;height:30px;border-radius:50%;border:2px solid #e8356d;background:transparent;color:#e8356d;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.num-val{font-size:16px;font-weight:700;min-width:30px;text-align:center}
+.range-row{display:flex;align-items:center;gap:10px;padding:10px 14px}
+.range-row label{font-size:12px;color:#8a92a8;min-width:70px}
+.range-row input{flex:1;accent-color:#e8356d}
+.range-row span{font-size:12px;font-weight:700;min-width:30px;text-align:right}
+.tab-row{display:flex;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:10px}
+.tab{flex:1;padding:10px;text-align:center;font-size:12px;font-weight:700;color:#8a92a8;cursor:pointer;border-bottom:2px solid transparent}
+.tab.sel{color:#e8356d;border-bottom-color:#e8356d}
 
 /* ── BOTTOM NAV ── */
 #bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(6,8,14,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.07);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:50}
 .ni{flex:1;padding:10px 6px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:#4a5268;border:none;background:none;font-family:inherit}
-.ni.on{color:#c8f135}
+.ni.on{color:#e8356d}
 .ni svg{width:20px;height:20px}
-.ni span{font-size:9px;font-weight:700;letter-spacing:.03em}
+.ni span{font-size:9px;font-weight:700}
 
 /* ── MODALS ── */
 .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.88);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(12px)}
 .modal.on{display:flex}
-.mbox{background:#141820;border-radius:20px;padding:28px 24px;text-align:center;width:280px;max-width:88vw}
+.mbox{background:#141820;border-radius:20px;padding:26px 22px;text-align:center;width:280px;max-width:88vw}
 .mbox h2{font-size:20px;font-weight:800;margin-bottom:4px}
 .mbox p{color:#8a92a8;font-size:12px;margin-bottom:16px}
 .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}
@@ -195,26 +182,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 .nk:active{background:#2a3040;transform:scale(.93)}
 .pdots{display:flex;gap:10px;justify-content:center;margin-bottom:16px}
 .pd{width:11px;height:11px;border-radius:50%;border:2px solid rgba(255,255,255,.2)}
-.pd.on{background:#c8f135;border-color:#c8f135}
-
-/* ── TOAST / LOADER ── */
+.pd.on{background:#e8356d;border-color:#e8356d}
 #toasts{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
 .toast{background:#141820;border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:9px 16px;font-size:12px;font-weight:600;white-space:nowrap;box-shadow:0 6px 24px rgba(0,0,0,.7);animation:tin .25s ease-out}
-.toast.ok{color:#c8f135}
+.toast.ok{color:#34c759}
 @keyframes tin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 #loader{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:150;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px}
 #loader.on{display:flex}
-.spin{width:40px;height:40px;border:3px solid #1e2530;border-top-color:#c8f135;border-radius:50%;animation:sp .8s linear infinite}
+.spin{width:40px;height:40px;border:3px solid #1e2530;border-top-color:#e8356d;border-radius:50%;animation:sp .8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 #loader p{color:#8a92a8;font-size:13px}
+
+/* color pickers */
+.color-swatch-row{display:flex;gap:8px;flex-wrap:wrap}
+.csw{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.csw.sel{border-color:#fff;transform:scale(1.2)}
 </style>
 </head>
 <body>
-
 <div id="toasts"></div>
 <div id="loader"><div class="spin"></div><p id="ltxt">Processing...</p></div>
 
-<!-- PASSCODE MODAL -->
+<!-- PASSCODE -->
 <div class="modal" id="m-pass">
   <div class="mbox">
     <h2>🔒 Settings</h2><p>Enter passcode</p>
@@ -224,86 +213,174 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
       <button class="nk" onclick="np('4')">4</button><button class="nk" onclick="np('5')">5</button><button class="nk" onclick="np('6')">6</button>
       <button class="nk" onclick="np('7')">7</button><button class="nk" onclick="np('8')">8</button><button class="nk" onclick="np('9')">9</button>
       <button class="nk" style="font-size:11px;color:#8a92a8" onclick="closeM('m-pass')">Cancel</button>
-      <button class="nk" onclick="np('0')">0</button>
-      <button class="nk" style="font-size:13px" onclick="npDel()">⌫</button>
+      <button class="nk" onclick="np('0')">0</button><button class="nk" style="font-size:13px" onclick="npDel()">⌫</button>
     </div>
   </div>
 </div>
 
-<!-- QR MODAL -->
+<!-- QR -->
 <div class="modal" id="m-qr">
   <div class="mbox">
-    <h2>📲 Your Photo</h2><p>Scan to download</p>
+    <h2>📲 Get Your Photo</h2><p>Scan with your phone</p>
     <canvas id="qrc" width="190" height="190" style="border-radius:9px;display:block;margin:0 auto"></canvas>
-    <button class="primary" onclick="closeM('m-qr')">Done ✓</button>
+    <button class="primary" onclick="closeM('m-qr')" style="margin-top:14px">Done ✓</button>
   </div>
 </div>
 
-<!-- ═══ ATTRACT ═══ -->
-<div class="screen active" id="s-attract" onclick="go('s-mode')">
-  <div class="logo" id="lbl-logo">SnapBooth</div>
-  <div class="sub"  id="lbl-tag">Tap anywhere to start</div>
-  <div class="tapbtn">▶ Begin Session</div>
+<!-- NEW EVENT MODAL -->
+<div class="modal" id="m-newevent">
+  <div class="mbox">
+    <h2>✨ New Event</h2><p>Give your event a name</p>
+    <input id="new-event-name" placeholder="e.g. Sarah's Wedding" style="width:100%;padding:12px;background:#1e2530;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px">
+    <button class="primary" style="margin-top:0" onclick="createEvent()">Create Event →</button>
+    <button class="secondary" onclick="closeM('m-newevent')">Cancel</button>
+  </div>
 </div>
 
-<!-- ═══ MODE ═══ -->
-<div class="screen page" id="s-mode">
+<!-- ═══ HOME / EVENTS ═══ -->
+<div class="screen active" id="s-home">
   <div class="hdr">
-    <button class="back" onclick="go('s-attract')">←</button>
-    <div><h1>Choose Mode</h1><p>Select your capture style</p></div>
+    <h1 style="flex:1;font-size:20px">📸 SnapBooth</h1>
+    <button class="back" onclick="navSet()" style="width:auto;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;color:#e8356d;border-color:rgba(232,53,109,.3)">⚙ Settings</button>
   </div>
-  <div class="page-scroll">
-    <div class="mgrid">
-      <div class="mcard sel" data-m="photo" onclick="selMode('photo',this)"><div class="mic">📸</div><h3>Photo Booth</h3><p>Classic strips & grids</p></div>
-      <div class="mcard" data-m="gif"     onclick="selMode('gif',this)"><div class="mic">🎞️</div><h3>GIF Booth</h3><p>Animated GIF</p></div>
-      <div class="mcard" data-m="boomerang" onclick="selMode('boomerang',this)"><div class="mic">🔁</div><h3>Boomerang</h3><p>Loop video clip</p></div>
-      <div class="mcard" data-m="video"   onclick="selMode('video',this)"><div class="mic">🎬</div><h3>Video</h3><p>Short recording</p></div>
-      <div class="mcard" data-m="glamour" onclick="selMode('glamour',this)"><div class="mic">✨</div><h3>Glam Booth</h3><p>Beauty filter</p></div>
-      <div class="mcard" data-m="single"  onclick="selMode('single',this)"><div class="mic">🖼️</div><h3>Single Shot</h3><p>One photo</p></div>
+  <div class="events-split">
+    <div class="events-list" id="events-list"></div>
+    <div class="events-detail" id="events-detail">
+      <p style="color:#4a5268;font-size:13px;text-align:center;margin-top:40px">Select an event<br>or create a new one</p>
     </div>
-    <button class="primary" onclick="modeNext()">Continue →</button>
+  </div>
+  <button onclick="openM('m-newevent')" style="position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);right:16px;width:52px;height:52px;border-radius:50%;background:#e8356d;border:none;color:#fff;font-size:26px;cursor:pointer;box-shadow:0 4px 20px rgba(232,53,109,.4);z-index:40;display:flex;align-items:center;justify-content:center">+</button>
+</div>
+
+<!-- ═══ WELCOME EDITOR ═══ -->
+<div class="screen" id="s-welcome">
+  <div class="hdr">
+    <button class="back" onclick="go('s-home')">←</button>
+    <div><h1>Edit Welcome Screen</h1><p>Customize for your guests</p></div>
+  </div>
+  <div class="welcome-preview" id="wp">
+    <div class="wp-bg" id="wp-bg"></div>
+    <div class="wp-content">
+      <div class="wp-logo" id="wp-logo">📸</div>
+      <div class="wp-title" id="wp-title">Your Event</div>
+      <div class="wp-sub"  id="wp-sub">Tap to start</div>
+      <button class="wp-btn">Photo</button>
+    </div>
+  </div>
+  <div class="tool-bar">
+    <button class="tool-btn" onclick="wpTool('image')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>Image
+    </button>
+    <button class="tool-btn" onclick="wpTool('text')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,7 4,4 20,4 20,7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>Text
+    </button>
+    <button class="tool-btn" onclick="wpTool('theme')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>Theme
+    </button>
+    <button class="tool-btn" onclick="wpTool('colors')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>Colors
+    </button>
+    <button class="tool-btn" onclick="wpTool('background')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>BG
+    </button>
+  </div>
+  <div class="scroll" id="wp-tool-content">
+    <p style="color:#4a5268;font-size:13px;text-align:center;margin-top:20px">Tap a tool above to edit</p>
+  </div>
+  <div style="padding:10px 16px max(env(safe-area-inset-bottom),10px);border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;display:flex;gap:8px">
+    <button onclick="go('s-layout-editor')" class="secondary" style="margin:0;flex:1">Photo Layout →</button>
   </div>
 </div>
 
-<!-- ═══ LAYOUT ═══ -->
-<div class="screen page" id="s-layout">
+<!-- ═══ LAYOUT EDITOR ═══ -->
+<div class="screen" id="s-layout-editor">
   <div class="hdr">
-    <button class="back" onclick="go('s-mode')">←</button>
-    <div><h1>Layout</h1><p>Choose arrangement</p></div>
+    <button class="back" onclick="go('s-welcome')">←</button>
+    <div><h1>Photo Layout</h1><p>Design your strip or grid</p></div>
   </div>
-  <div class="page-scroll">
-    <div class="lgrid" id="lgrid"></div>
-    <button class="primary" onclick="go('s-filter');renderFilters()">Choose Filter →</button>
+  <div class="layout-canvas">
+    <div class="layout-canvas-inner" id="layout-canvas-inner"></div>
+  </div>
+  <div class="scroll" style="padding:10px 16px 100px">
+    <div class="sect">Presets</div>
+    <div class="layout-presets" id="layout-presets"></div>
+    <div class="sect">Border Color</div>
+    <div class="color-swatch-row" style="padding:4px 0 10px">
+      <div class="csw sel" style="background:#fff"     data-c="#ffffff" onclick="setBorderColor('#ffffff',this)"></div>
+      <div class="csw"     style="background:#000"     data-c="#000000" onclick="setBorderColor('#000000',this)"></div>
+      <div class="csw"     style="background:#e8356d"  data-c="#e8356d" onclick="setBorderColor('#e8356d',this)"></div>
+      <div class="csw"     style="background:#c8f135"  data-c="#c8f135" onclick="setBorderColor('#c8f135',this)"></div>
+      <div class="csw"     style="background:#7b61ff"  data-c="#7b61ff" onclick="setBorderColor('#7b61ff',this)"></div>
+      <div class="csw"     style="background:#ffd93d"  data-c="#ffd93d" onclick="setBorderColor('#ffd93d',this)"></div>
+    </div>
+    <div class="sect">Text Overlay</div>
+    <div class="card" style="margin-bottom:10px">
+      <div class="row">
+        <div><div class="rl">Event Name Text</div><div class="rsd">Shows at bottom of strip</div></div>
+        <div class="tog on" id="tog-eventtext" onclick="togS('showEventText')"></div>
+      </div>
+      <div class="row">
+        <div><div class="rl">Date</div><div class="rsd">Add date to strip</div></div>
+        <div class="tog" id="tog-showdate" onclick="togS('showDate')"></div>
+      </div>
+    </div>
+    <div class="sect">Logo</div>
+    <div style="border:2px dashed rgba(255,255,255,.1);border-radius:10px;padding:14px;text-align:center;cursor:pointer;background:#141820;margin-bottom:10px" onclick="document.getElementById('logo-inp').click()">
+      <div style="font-size:22px">🖼️</div>
+      <p style="color:#8a92a8;font-size:11px;margin-top:5px">Upload logo / watermark (PNG)</p>
+      <img id="logo-prev" style="display:none;max-height:50px;margin-top:8px;border-radius:5px">
+    </div>
+    <input type="file" id="logo-inp" accept="image/*" style="display:none" onchange="upLogo(this)">
+    <div class="sect">Frame Templates</div>
+    <div style="border:2px dashed rgba(255,255,255,.1);border-radius:10px;padding:14px;text-align:center;cursor:pointer;background:#141820;margin-bottom:6px" onclick="document.getElementById('frame-inp').click()">
+      <div style="font-size:22px">🎨</div>
+      <p style="color:#8a92a8;font-size:11px;margin-top:5px">Upload custom frame overlays (PNG)</p>
+    </div>
+    <input type="file" id="frame-inp" accept="image/*" multiple style="display:none" onchange="upFrames(this)">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px" id="frame-thumbs"></div>
+  </div>
+  <div style="padding:10px 16px max(env(safe-area-inset-bottom),10px);border-top:1px solid rgba(255,255,255,.07);flex-shrink:0">
+    <button class="primary" style="margin:0" onclick="launchFromEditor()">▶ Launch Capture Mode →</button>
   </div>
 </div>
 
-<!-- ═══ FILTER ═══ -->
-<div class="screen page" id="s-filter">
+<!-- ═══ CAPTURE MODE SELECT ═══ -->
+<div class="screen" id="s-capture-select">
   <div class="hdr">
-    <button class="back" onclick="go('s-layout')">←</button>
-    <div><h1>Filter</h1><p>Pick a look</p></div>
+    <button class="back" onclick="go('s-layout-editor')">←</button>
+    <div><h1>Capture Mode</h1><p>Select how to capture</p></div>
   </div>
-  <div class="page-scroll">
-    <div class="fgrid" id="fgrid"></div>
+  <div class="scroll">
+    <div class="mgrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="mode-icon-item sel" data-m="photo" onclick="selMode('photo',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span style="color:#fff;font-weight:700;font-size:13px">Photo</span>
+      </div>
+      <div class="mode-icon-item" data-m="gif" onclick="selMode('gif',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+        <span style="color:#fff;font-weight:700;font-size:13px">GIF</span>
+      </div>
+      <div class="mode-icon-item" data-m="boomerang" onclick="selMode('boomerang',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+        <span style="color:#fff;font-weight:700;font-size:13px">Boomerang</span>
+      </div>
+      <div class="mode-icon-item" data-m="video" onclick="selMode('video',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23,7 16,12 23,17"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        <span style="color:#fff;font-weight:700;font-size:13px">Video</span>
+      </div>
+    </div>
+    <div class="sect" style="margin-top:20px">Layout</div>
+    <div class="layout-presets" id="capture-layout-grid"></div>
+    <div class="sect">Filter</div>
+    <div class="fgrid2" id="capture-filter-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px"></div>
     <button class="primary" onclick="beginCap()">Start Session 🎉</button>
   </div>
 </div>
 
-<!-- ═══ CAMERA ═══
-  NOTE: video element is ALWAYS in the DOM.
-  The screen uses display:none/flex but the video
-  itself is never hidden independently.
--->
+<!-- ═══ CAMERA ═══ -->
 <div class="screen" id="s-camera">
-  <video id="cam-vid"
-    autoplay
-    playsinline
-    muted
-    webkit-playsinline
-    x5-playsinline
-  ></video>
-
-  <div id="cam-overlay">
+  <video id="cam-vid" autoplay playsinline muted webkit-playsinline x5-playsinline></video>
+  <div id="cam-ui">
     <div class="cam-top">
       <button class="icb" onclick="exitCam()">✕</button>
       <div class="sdots" id="sdots"></div>
@@ -316,7 +393,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
       <button class="icb" onclick="addSticker()">😊</button>
     </div>
   </div>
-
+  <div class="mode-pill" id="mode-pill">Photo</div>
   <div id="cdwrap"><div id="cdnum">3</div></div>
   <div id="flash"></div>
 </div>
@@ -324,23 +401,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 <!-- ═══ REVIEW ═══ -->
 <div class="screen" id="s-review">
   <canvas id="rev-canvas"></canvas>
-  <div id="rev-overlay">
+  <div id="rev-ui">
     <div class="rev-top">
       <button class="back" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.2)" onclick="retake()">←</button>
       <span class="rev-title">Your Photo ✨</span>
     </div>
     <div class="rev-bot">
       <div class="srow">
-        <button class="sbtn s-air"   onclick="doShare()">
+        <button class="sbtn s-air" onclick="doShare()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1"/></svg>AirDrop
         </button>
-        <button class="sbtn s-save"  onclick="doSave()">
+        <button class="sbtn s-save" onclick="doSave()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save
         </button>
         <button class="sbtn s-print" onclick="doPrint()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print
         </button>
-        <button class="sbtn s-qr"    onclick="doQR()">
+        <button class="sbtn s-qr" onclick="doQR()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>QR
         </button>
       </div>
@@ -351,14 +428,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 </div>
 
 <!-- ═══ GALLERY ═══ -->
-<div class="screen page" id="s-gallery">
-  <div class="hdr" style="justify-content:space-between">
-    <div style="display:flex;align-items:center;gap:12px">
-      <button class="back" onclick="navHome()">←</button><h1>Gallery</h1>
-    </div>
-    <button onclick="clearGal()" style="background:none;border:none;color:#4a5268;font-size:12px;cursor:pointer;font-family:inherit">Clear</button>
+<div class="screen" id="s-gallery">
+  <div class="hdr">
+    <button class="back" onclick="navHome()">←</button>
+    <h1>Gallery</h1>
+    <button onclick="clearGal()" style="background:none;border:none;color:#4a5268;font-size:12px;cursor:pointer;font-family:inherit;margin-left:auto">Clear</button>
   </div>
-  <div class="page-scroll" style="padding:8px 8px 100px">
+  <div class="scroll" style="padding:8px 8px 100px">
     <div class="ggrid" id="ggrid"></div>
     <div class="gempty" id="gempty" style="display:none">
       <div style="font-size:48px;opacity:.3">🖼️</div>
@@ -369,81 +445,81 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 </div>
 
 <!-- ═══ SETTINGS ═══ -->
-<div class="screen page" id="s-settings">
+<div class="screen" id="s-settings">
   <div class="hdr">
-    <button class="back" onclick="navHome()">←</button><h1>Settings</h1>
+    <button class="back" onclick="navHome()">←</button>
+    <h1>Settings</h1>
   </div>
-  <div class="page-scroll">
-    <div class="st">Branding</div>
-    <div class="sg">
-      <div class="si" onclick="ev('appName','Booth Name')">
-        <div><div class="sl">Booth Name</div><div class="sd2" id="sv-appName">SnapBooth</div></div><span style="color:#4a5268">›</span>
-      </div>
-      <div class="si" onclick="ev('eventName','Event Name')">
-        <div><div class="sl">Event Name</div><div class="sd2" id="sv-eventName">Not set</div></div><span style="color:#4a5268">›</span>
-      </div>
-      <div class="si" onclick="ev('tagline','Start Screen Tagline')">
-        <div><div class="sl">Tagline</div><div class="sd2" id="sv-tagline">Tap anywhere to start</div></div><span style="color:#4a5268">›</span>
-      </div>
-    </div>
-
-    <div class="st">Logo</div>
-    <div class="upz" onclick="document.getElementById('li').click()">
-      <div style="font-size:24px">🖼️</div><p>Tap to upload logo / watermark (PNG)</p>
-      <img id="lprev" style="display:none;max-height:60px;margin-top:8px;border-radius:6px">
-    </div>
-    <input type="file" id="li" accept="image/*" style="display:none" onchange="upLogo(this)">
-
-    <div class="st">Frame Templates</div>
-    <div class="upz" onclick="document.getElementById('fi').click()">
-      <div style="font-size:24px">🎨</div><p>Upload custom frame overlays (PNG)</p>
-    </div>
-    <input type="file" id="fi" accept="image/*" multiple style="display:none" onchange="upFrames(this)">
-    <div class="fthumbs" id="fthumbs"></div>
-
-    <div class="st">Capture</div>
-    <div class="sg">
-      <div class="si">
-        <div class="sl">Countdown Timer</div>
-        <div class="trow">
-          <button class="topt"     onclick="setCD(0,this)">Off</button>
-          <button class="topt sel" onclick="setCD(3,this)">3s</button>
-          <button class="topt"     onclick="setCD(5,this)">5s</button>
-          <button class="topt"     onclick="setCD(10,this)">10s</button>
+  <div class="scroll">
+    <div class="sect">Capture</div>
+    <div class="card">
+      <div class="row">
+        <div class="rl">Countdown Timer</div>
+        <div class="chip-row">
+          <button class="chip" onclick="setCD(0,this)">Off</button>
+          <button class="chip sel" onclick="setCD(3,this)">3s</button>
+          <button class="chip" onclick="setCD(5,this)">5s</button>
+          <button class="chip" onclick="setCD(10,this)">10s</button>
         </div>
       </div>
-      <div class="si"><div><div class="sl">Mirror Mode</div><div class="sd2">Flip camera</div></div><div class="tog on" id="tog-mirror" onclick="togS('mirror')"></div></div>
-      <div class="si"><div><div class="sl">Flash Effect</div></div><div class="tog on" id="tog-flash" onclick="togS('flash')"></div></div>
-      <div class="si"><div><div class="sl">Shutter Sound</div></div><div class="tog on" id="tog-sound" onclick="togS('sound')"></div></div>
-      <div class="si"><div><div class="sl">Auto-reset (15s)</div><div class="sd2">Return to start after sharing</div></div><div class="tog on" id="tog-autoreset" onclick="togS('autoreset')"></div></div>
+      <div class="row"><div><div class="rl">Mirror Mode</div><div class="rsd">Flip camera</div></div><div class="tog on" id="tog-mirror" onclick="togS('mirror')"></div></div>
+      <div class="row"><div><div class="rl">Flash Effect</div></div><div class="tog on" id="tog-flash" onclick="togS('flash')"></div></div>
+      <div class="row"><div><div class="rl">Shutter Sound</div></div><div class="tog on" id="tog-sound" onclick="togS('sound')"></div></div>
     </div>
 
-    <div class="st">Strip Border Color</div>
-    <div class="sg">
-      <div class="si">
-        <div class="sl">Border</div>
-        <div class="crow">
-          <div class="co sel" style="background:#fff"     data-c="#ffffff" onclick="setBC('#ffffff',this)"></div>
-          <div class="co"     style="background:#000"     data-c="#000000" onclick="setBC('#000000',this)"></div>
-          <div class="co"     style="background:#c8f135"  data-c="#c8f135" onclick="setBC('#c8f135',this)"></div>
-          <div class="co"     style="background:#ff6b6b"  data-c="#ff6b6b" onclick="setBC('#ff6b6b',this)"></div>
-          <div class="co"     style="background:#7b61ff"  data-c="#7b61ff" onclick="setBC('#7b61ff',this)"></div>
+    <div class="sect">Print Setup</div>
+    <div class="card">
+      <div class="row"><div><div class="rl">Print Automatically</div><div class="rsd">Print on capture completion</div></div><div class="tog" id="tog-autoPrint" onclick="togS('autoPrint')"></div></div>
+      <div class="row"><div><div class="rl">Display Print Button</div></div><div class="tog on" id="tog-showPrint" onclick="togS('showPrint')"></div></div>
+      <div class="row" style="cursor:default">
+        <div class="rl">Max Guest Copies</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adjustNum('maxCopies',-1)">−</button>
+          <span class="num-val" id="val-maxCopies">2</span>
+          <button class="num-btn" onclick="adjustNum('maxCopies',1)">+</button>
+        </div>
+      </div>
+      <div class="row" style="cursor:default">
+        <div class="rl">Max Event Prints</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adjustNum('maxPrints',-10)">−</button>
+          <span class="num-val" id="val-maxPrints">999</span>
+          <button class="num-btn" onclick="adjustNum('maxPrints',10)">+</button>
+        </div>
+      </div>
+      <div class="sect" style="padding:0 14px;margin-top:6px">Print Alignment</div>
+      <div class="range-row"><label>Scale</label><input type="range" min="50" max="150" value="100" id="print-scale" oninput="document.getElementById('v-scale').textContent=this.value"><span id="v-scale">100</span></div>
+      <div class="range-row"><label>Horizontal</label><input type="range" min="-50" max="50" value="0" id="print-h" oninput="document.getElementById('v-h').textContent=this.value"><span id="v-h">0</span></div>
+      <div class="range-row"><label>Vertical</label><input type="range" min="-50" max="50" value="0" id="print-v" oninput="document.getElementById('v-v').textContent=this.value"><span id="v-v">0</span></div>
+    </div>
+
+    <div class="sect">Sharing</div>
+    <div class="card">
+      <div class="row"><div><div class="rl">AirDrop</div></div><div class="tog on" id="tog-showAirdrop" onclick="togS('showAirdrop')"></div></div>
+      <div class="row"><div><div class="rl">QR Code</div><div class="rsd">Guests scan to download</div></div><div class="tog on" id="tog-showQR" onclick="togS('showQR')"></div></div>
+      <div class="row"><div><div class="rl">Show Original Photos</div><div class="rsd">Thumbnails on share screen</div></div><div class="tog on" id="tog-showOriginals" onclick="togS('showOriginals')"></div></div>
+      <div class="row"><div><div class="rl">Display Delete Button</div></div><div class="tog on" id="tog-showDelete" onclick="togS('showDelete')"></div></div>
+      <div class="row" style="cursor:default">
+        <div class="rl">Sharing Timeout</div>
+        <div class="chip-row">
+          <button class="chip" onclick="setST(15,this)">15s</button>
+          <button class="chip sel" onclick="setST(30,this)">30s</button>
+          <button class="chip" onclick="setST(60,this)">60s</button>
+          <button class="chip" onclick="setST(0,this)">Off</button>
         </div>
       </div>
     </div>
 
-    <div class="st">Security</div>
-    <div class="sg">
-      <div class="si" onclick="ev('passcode','New 4-digit Passcode')">
-        <div><div class="sl">Passcode</div><div class="sd2">Default: 1234</div></div><span style="color:#4a5268">›</span>
-      </div>
-      <div class="si"><div><div class="sl">Lock Settings</div><div class="sd2">Require passcode</div></div><div class="tog on" id="tog-kioskLock" onclick="togS('kioskLock')"></div></div>
+    <div class="sect">Security</div>
+    <div class="card">
+      <div class="row" onclick="evEdit('passcode','New 4-digit Passcode')"><div><div class="rl">Passcode</div><div class="rsd">Default: 1234</div></div><span class="ra">›</span></div>
+      <div class="row"><div><div class="rl">Lock Settings</div><div class="rsd">Require passcode</div></div><div class="tog on" id="tog-kioskLock" onclick="togS('kioskLock')"></div></div>
     </div>
 
-    <div class="st">About</div>
-    <div class="sg">
-      <div class="si"><div><div class="sl">SnapBooth v1.0</div><div class="sd2">Photo Booth PWA</div></div></div>
-      <div class="si" onclick="resetAll()"><div class="sl" style="color:#ff3b30">Reset All Settings</div></div>
+    <div class="sect">About</div>
+    <div class="card">
+      <div class="row"><div><div class="rl">SnapBooth v2.0</div><div class="rsd">Photo Booth PWA</div></div></div>
+      <div class="row" onclick="resetAll()"><div class="rl" style="color:#ff3b30">Reset All Settings</div></div>
     </div>
   </div>
 </div>
@@ -452,7 +528,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 <div id="bnav" style="display:none">
   <button class="ni on" id="n-home" onclick="navHome()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-    <span>Home</span>
+    <span>Events</span>
   </button>
   <button class="ni" id="n-gal" onclick="navGal()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
@@ -465,13 +541,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font
 </div>
 
 <script>
-// ─── STATE ───
-let S={appName:'SnapBooth',eventName:'',tagline:'Tap anywhere to start',passcode:'1234',kioskLock:true,mirror:true,flash:true,sound:true,autoreset:true,borderColor:'#ffffff',countdown:3,logoUrl:null,frames:[]};
-let gallery=[];
-try{const v=localStorage.getItem('sb_s');if(v)Object.assign(S,JSON.parse(v));}catch(e){}
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let S={mirror:true,flash:true,sound:true,kioskLock:true,countdown:3,
+  autoPrint:false,showPrint:true,maxCopies:2,maxPrints:999,
+  showAirdrop:true,showQR:true,showOriginals:true,showDelete:true,sharingTimeout:30,
+  showEventText:true,showDate:false,
+  borderColor:'#ffffff',logoUrl:null,frames:[],passcode:'1234'};
+let events=[], currentEventIdx=0, gallery=[];
+try{const v=localStorage.getItem('sb_s2');if(v)Object.assign(S,JSON.parse(v));}catch(e){}
+try{const v=localStorage.getItem('sb_ev');if(v)events=JSON.parse(v);}catch(e){}
 try{const v=localStorage.getItem('sb_g');if(v)gallery=JSON.parse(v);}catch(e){}
+if(!events.length){events=[{id:1,name:'My Event',bg:'linear-gradient(135deg,#667eea,#764ba2)',title:'My Event',subtitle:'Tap to start',layout:'3x1',filter:'none',mode:'photo'}];}
 
-let mode='photo',lay='3x1',filt='none';
+let mode='photo',layout='3x1',filt='none';
 let captured=[],camStream=null,facing='user';
 let capturing=false,passEntry='',passCB=null,autoTmr=null;
 
@@ -481,7 +565,7 @@ const LAYOUTS=[
   {id:'3x1',name:'3 Strip',desc:'Classic',shots:3,cols:1,rows:3},
   {id:'4x1',name:'4 Strip',desc:'4 photos',shots:4,cols:1,rows:4},
   {id:'2x2',name:'2×2 Grid',desc:'4 grid',shots:4,cols:2,rows:2},
-  {id:'3x2',name:'3×2 Grid',desc:'6 grid',shots:6,cols:3,rows:2},
+  {id:'3x2',name:'3×2',desc:'6 grid',shots:6,cols:3,rows:2},
 ];
 const FILTERS=[
   {id:'none',name:'Original',css:'none',e:'🌈'},
@@ -494,116 +578,284 @@ const FILTERS=[
   {id:'noir',name:'Noir',css:'grayscale(100%) contrast(140%) brightness(90%)',e:'🖤'},
   {id:'glam',name:'Glam',css:'brightness(110%) contrast(105%) saturate(120%)',e:'✨'},
 ];
-const NAV=['s-mode','s-layout','s-filter','s-gallery','s-settings'];
+const THEMES=[
+  {name:'Purple Dream',bg:'linear-gradient(135deg,#667eea,#764ba2)'},
+  {name:'Sunset',bg:'linear-gradient(135deg,#f093fb,#f5576c)'},
+  {name:'Ocean',bg:'linear-gradient(135deg,#4facfe,#00f2fe)'},
+  {name:'Forest',bg:'linear-gradient(135deg,#43e97b,#38f9d7)'},
+  {name:'Gold',bg:'linear-gradient(135deg,#f7971e,#ffd200)'},
+  {name:'Midnight',bg:'linear-gradient(135deg,#0f0c29,#302b63)'},
+  {name:'Rose',bg:'linear-gradient(135deg,#ffecd2,#fcb69f)'},
+  {name:'Electric',bg:'linear-gradient(135deg,#a18cd1,#fbc2eb)'},
+  {name:'Dark',bg:'#111'},
+];
+const NAV=['s-home','s-gallery','s-settings','s-welcome','s-layout-editor','s-capture-select'];
 
-// ─── NAV ───
+// ═══════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.getElementById('bnav').style.display=NAV.includes(id)?'flex':'none';
   if(id==='s-gallery')renderGal();
-  if(id==='s-attract')applyBranding();
+  if(id==='s-home')renderEvents();
+  if(id==='s-capture-select'){renderCaptureSelect();}
   if(id!=='s-camera')stopCam();
 }
-function navHome(){setN('n-home');go('s-mode');}
-function navGal() {setN('n-gal'); go('s-gallery');}
-function navSet() {
+function navHome(){setN('n-home');go('s-home');}
+function navGal(){setN('n-gal');go('s-gallery');}
+function navSet(){
   if(S.kioskLock){openPass(()=>{setN('n-set');go('s-settings');});}
   else{setN('n-set');go('s-settings');}
 }
 function setN(id){document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));document.getElementById(id).classList.add('on');}
 
-// ─── MODE / LAYOUT / FILTER ───
-function selMode(m,el){mode=m;document.querySelectorAll('.mcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
-function modeNext(){go('s-layout');renderLayouts();}
-function renderLayouts(){
-  document.getElementById('lgrid').innerHTML=LAYOUTS.map(l=>{
-    const boxes=Array(l.shots).fill(0).map(()=>{
-      const w=l.cols===1?42:l.cols===2?30:22,h=l.rows<=2?34:l.rows===3?22:16;
-      return `<div class="lb" style="width:${w}px;height:${h}px"></div>`;
-    }).join('');
+// ═══════════════════════════════════════════
+// EVENTS
+// ═══════════════════════════════════════════
+function saveEvents(){try{localStorage.setItem('sb_ev',JSON.stringify(events));}catch(e){}}
+function renderEvents(){
+  const list=document.getElementById('events-list');
+  list.innerHTML=events.map((ev,i)=>`
+    <div class="ev-item ${i===currentEventIdx?'sel':''}" onclick="selectEvent(${i})">
+      <h3>${ev.name}</h3>
+      <p>${ev.mode||'Photo'} · ${ev.layout||'3x1'}</p>
+    </div>
+  `).join('');
+  renderEventDetail(currentEventIdx);
+}
+function selectEvent(i){
+  currentEventIdx=i;
+  renderEvents();
+}
+function renderEventDetail(i){
+  const ev=events[i];
+  const det=document.getElementById('events-detail');
+  det.innerHTML=`
+    <div class="copy-link" onclick="copyEventLink()">Copy event settings ›</div>
+    <button class="launch-btn" onclick="launchEvent(${i})">⚡ Launch event</button>
+    <button class="new-btn" onclick="openM('m-newevent')">+ New event</button>
+    <div style="height:14px"></div>
+    <div class="detail-section">
+      <h4>Start screen</h4>
+      <div class="start-preview" style="cursor:pointer" onclick="editEvent(${i})">
+        <div style="position:absolute;inset:0;${ev.bg?'background:'+ev.bg:'background:linear-gradient(135deg,#667eea,#764ba2)'}"></div>
+        <div style="position:relative;z-index:1;text-align:center;padding:10px">
+          <div style="font-size:11px;color:rgba(255,255,255,.8);font-style:italic">${ev.title||ev.name}</div>
+          <div style="margin-top:6px;width:28px;height:28px;background:rgba(255,255,255,.2);border-radius:50%;margin:6px auto;display:flex;align-items:center;justify-content:center;font-size:14px">📸</div>
+          <div style="font-size:10px;color:#fff">Photo</div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>Capture</h4>
+      <div class="mode-icons">
+        <div class="mode-icon-item ${(ev.mode||'photo')==='photo'?'sel':''}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Photo
+        </div>
+        <div class="mode-icon-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+          GIF
+        </div>
+        <div class="mode-icon-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7,23 3,19 7,15"/></svg>
+          Boomerang
+        </div>
+        <div class="mode-icon-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23,7 16,12 23,17"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          Video
+        </div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>Print</h4>
+      <div class="det-row"><span class="chk">✓</span> Print to: AirPrint</div>
+      <div class="det-row"><span class="chk">✓</span> Copies: ${S.maxCopies}</div>
+    </div>
+    <div class="detail-section">
+      <h4>Sharing</h4>
+      <div class="det-row"><span class="chk">✓</span> AirDrop</div>
+      <div class="det-row"><span class="chk">✓</span> Save to Camera Roll</div>
+      <div class="det-row"><span class="chk">✓</span> QR Code</div>
+      <div class="det-row"><span class="chk">✓</span> AirPrint</div>
+    </div>
+  `;
+}
+function createEvent(){
+  const name=document.getElementById('new-event-name').value.trim()||'New Event';
+  events.push({id:Date.now(),name,bg:'linear-gradient(135deg,#667eea,#764ba2)',title:name,subtitle:'Tap to start',layout:'3x1',filter:'none',mode:'photo'});
+  currentEventIdx=events.length-1;
+  saveEvents(); closeM('m-newevent');
+  document.getElementById('new-event-name').value='';
+  renderEvents(); toast('✅ Event created','ok');
+}
+function launchEvent(i){
+  currentEventIdx=i;
+  const ev=events[i];
+  layout=ev.layout||'3x1'; filt=ev.filter||'none'; mode=ev.mode||'photo';
+  go('s-welcome'); updateWelcomePreview();
+}
+function editEvent(i){launchEvent(i);}
+function copyEventLink(){toast('📋 Event settings copied');}
+
+// ═══════════════════════════════════════════
+// WELCOME EDITOR
+// ═══════════════════════════════════════════
+function updateWelcomePreview(){
+  const ev=events[currentEventIdx]||events[0];
+  document.getElementById('wp-bg').style.cssText=`position:absolute;inset:0;${ev.bg&&ev.bg.startsWith('linear')?'background:'+ev.bg:ev.bg?'background:'+ev.bg:'background:linear-gradient(135deg,#667eea,#764ba2)'}`;
+  document.getElementById('wp-title').textContent=ev.title||ev.name;
+  document.getElementById('wp-sub').textContent=ev.subtitle||'Tap to start';
+  if(ev.logoUrl){document.getElementById('wp-logo').innerHTML=`<img src="${ev.logoUrl}" style="max-width:50px;max-height:50px;border-radius:6px">`;}
+}
+function wpTool(tool){
+  const ev=events[currentEventIdx];
+  const cont=document.getElementById('wp-tool-content');
+  if(tool==='text'){
+    cont.innerHTML=`
+      <div class="sect">Title Text</div>
+      <input value="${ev.title||ev.name}" oninput="events[currentEventIdx].title=this.value;updateWelcomePreview();saveEvents()" style="width:100%;padding:11px;background:#141820;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px">
+      <div class="sect">Subtitle Text</div>
+      <input value="${ev.subtitle||'Tap to start'}" oninput="events[currentEventIdx].subtitle=this.value;updateWelcomePreview();saveEvents()" style="width:100%;padding:11px;background:#141820;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:14px;font-family:inherit;outline:none">
+    `;
+  } else if(tool==='theme'){
+    cont.innerHTML=`<div class="sect">Choose a Theme</div><div class="theme-grid">${THEMES.map((t,i)=>`<div class="theme-card" style="${t.bg.startsWith('linear')?'background:'+t.bg:'background:'+t.bg}" onclick="applyTheme(${i})"><span>${t.name}</span></div>`).join('')}</div>`;
+  } else if(tool==='colors'){
+    cont.innerHTML=`
+      <div class="sect">Background Color</div>
+      <div class="color-swatch-row" style="padding:4px 0 14px">
+        ${['#111','#fff','#e8356d','#7b61ff','#0a84ff','#34c759','#ff9f0a','#ff3b30'].map(c=>`<div class="csw" style="background:${c}" onclick="applyBgColor('${c}')"></div>`).join('')}
+      </div>
+      <div class="sect">Custom Color</div>
+      <input type="color" value="#667eea" oninput="applyBgColor(this.value)" style="width:60px;height:40px;border:none;background:none;cursor:pointer;border-radius:8px">
+    `;
+  } else if(tool==='background'){
+    cont.innerHTML=`
+      <div class="sect">Upload Background Image</div>
+      <div style="border:2px dashed rgba(255,255,255,.1);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:#141820" onclick="document.getElementById('bg-inp').click()">
+        <div style="font-size:24px">🖼️</div>
+        <p style="color:#8a92a8;font-size:11px;margin-top:6px">Upload PNG or JPG</p>
+        ${ev.bgImg?`<img src="${ev.bgImg}" style="max-height:80px;margin-top:8px;border-radius:6px">` : ''}
+      </div>
+      <input type="file" id="bg-inp" accept="image/*" style="display:none" onchange="uploadBg(this)">
+    `;
+  } else if(tool==='image'){
+    cont.innerHTML=`
+      <div class="sect">Logo / Watermark</div>
+      <div style="border:2px dashed rgba(255,255,255,.1);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:#141820" onclick="document.getElementById('logo-inp').click()">
+        <div style="font-size:24px">🖼️</div>
+        <p style="color:#8a92a8;font-size:11px;margin-top:6px">Upload PNG (transparent recommended)</p>
+        <img id="logo-prev" style="display:${ev.logoUrl?'block':'none'};max-height:60px;margin-top:8px;border-radius:6px" src="${ev.logoUrl||''}">
+      </div>
+      <input type="file" id="logo-inp" accept="image/*" style="display:none" onchange="upLogo(this)">
+    `;
+  }
+}
+function applyTheme(i){events[currentEventIdx].bg=THEMES[i].bg;saveEvents();updateWelcomePreview();toast('✅ Theme applied','ok');}
+function applyBgColor(c){events[currentEventIdx].bg=c;saveEvents();updateWelcomePreview();}
+function uploadBg(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();r.onload=e=>{events[currentEventIdx].bgImg=e.target.result;events[currentEventIdx].bg='url('+e.target.result+')';saveEvents();updateWelcomePreview();toast('✅ Background uploaded','ok');wpTool('background');};r.readAsDataURL(f);
+}
+
+// ═══════════════════════════════════════════
+// LAYOUT EDITOR
+// ═══════════════════════════════════════════
+function renderCaptureSelect(){
+  // Layout presets
+  document.getElementById('capture-layout-grid').innerHTML=LAYOUTS.map(l=>{
+    const boxes=Array(l.shots).fill(0).map(()=>{const w=l.cols===1?42:l.cols===2?30:22,h=l.rows<=2?34:l.rows===3?22:16;return `<div class="ppb" style="width:${w}px;height:${h}px"></div>`;}).join('');
     const dir=l.cols===1?'column':'row',wrap=l.cols>1?'flex-wrap:wrap':'';
-    return `<div class="lcard ${l.id===lay?'sel':''}" onclick="selLay('${l.id}',this)">
-      <div class="lprev" style="flex-direction:${dir};${wrap};gap:3px">${boxes}</div>
+    return `<div class="preset-card ${l.id===layout?'sel':''}" onclick="selLayout('${l.id}',this)">
+      <div class="preset-prev" style="flex-direction:${dir};${wrap};gap:2px">${boxes}</div>
       <h4>${l.name}</h4><small>${l.desc}</small></div>`;
   }).join('');
+  // Filters
+  document.getElementById('capture-filter-grid').innerHTML=FILTERS.map(f=>`
+    <div style="border:2px solid ${f.id===filt?'#e8356d':'rgba(255,255,255,.07)'};border-radius:10px;overflow:hidden;cursor:pointer" onclick="selFilter('${f.id}',this)">
+      <div style="aspect-ratio:4/3;background:#1e2530;display:flex;align-items:center;justify-content:center;font-size:22px;filter:${f.css}">${f.e}</div>
+      <div style="padding:5px;text-align:center;font-size:10px;font-weight:600;background:#141820">${f.name}</div>
+    </div>`).join('');
+  // Layout canvas
+  renderLayoutCanvas();
 }
-function selLay(id,el){lay=id;document.querySelectorAll('.lcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
-function renderFilters(){
-  document.getElementById('fgrid').innerHTML=FILTERS.map(f=>
-    `<div class="fcard ${f.id===filt?'sel':''}" onclick="selFil('${f.id}',this)">
-      <div class="fprev" style="filter:${f.css}">${f.e}</div>
-      <div class="fname">${f.name}</div></div>`
-  ).join('');
+function renderLayoutCanvas(){
+  const L=LAYOUTS.find(l=>l.id===layout);
+  const inner=document.getElementById('layout-canvas-inner');
+  inner.innerHTML='';
+  const pw=Math.floor((inner.offsetWidth||300)/L.cols)-6;
+  const ph=Math.round(pw*9/16);
+  for(let i=0;i<L.shots;i++){
+    const col=i%L.cols,row=Math.floor(i/L.cols);
+    const el=document.createElement('div');
+    el.className='photo-slot';
+    el.style.cssText=`width:${pw}px;height:${ph}px;left:${col*(pw+4)+4}px;top:${row*(ph+4)+4}px`;
+    el.textContent=i+1;
+    inner.appendChild(el);
+  }
 }
-function selFil(id,el){filt=id;document.querySelectorAll('.fcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function selLayout(id,el){
+  layout=id;
+  document.querySelectorAll('.preset-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  renderLayoutCanvas();
+}
+function selFilter(id,el){
+  filt=id;
+  document.querySelectorAll('#capture-filter-grid>div').forEach(c=>c.style.borderColor='rgba(255,255,255,.07)');
+  el.style.borderColor='#e8356d';
+}
+function setBorderColor(c,el){S.borderColor=c;document.querySelectorAll('.csw').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');saveS();}
+function launchFromEditor(){go('s-capture-select');renderCaptureSelect();}
 
-// ─── CAMERA ───
-// THE KEY INSIGHT FROM DIAGNOSTIC:
-// Camera works perfectly. The only issue was the screen
-// was switching to display:flex but the video had z-index
-// or stacking context issues. Fixed by keeping it simple.
+// ═══════════════════════════════════════════
+// CAMERA
+// ═══════════════════════════════════════════
+function selMode(m,el){
+  mode=m;
+  document.querySelectorAll('.mode-icon-item').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+}
 async function startCam(){
   const vid=document.getElementById('cam-vid');
   if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;vid.srcObject=null;}
-  try{
-    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false});
-  }catch(e){
-    try{camStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});}
-    catch(e2){toast('Camera error: '+e2.message);return;}
-  }
+  try{camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false});}
+  catch(e){try{camStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});}catch(e2){toast('Camera error: '+e2.message);return;}}
   const f=FILTERS.find(f=>f.id===filt);
   vid.style.filter=f?f.css:'none';
   vid.style.transform=S.mirror?'scaleX(-1)':'none';
-  vid.srcObject=camStream;
-  vid.muted=true;
-  // play() — confirmed working from diagnostic
+  vid.srcObject=camStream; vid.muted=true;
   await vid.play().catch(()=>{});
 }
-
 function stopCam(){
   if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
-  const vid=document.getElementById('cam-vid');
-  vid.srcObject=null;
+  const vid=document.getElementById('cam-vid'); vid.srcObject=null;
 }
-
 async function beginCap(){
-  const L=LAYOUTS.find(l=>l.id===lay);
+  const L=LAYOUTS.find(l=>l.id===layout);
   captured=[];
-
-  // Show camera screen
   go('s-camera');
   document.getElementById('bnav').style.display='none';
-
-  // Setup dots
-  document.getElementById('sdots').innerHTML=
-    Array(L.shots).fill(0).map((_,i)=>`<div class="sd ${i===0?'cur':''}"></div>`).join('');
+  document.getElementById('mode-pill').textContent=mode.charAt(0).toUpperCase()+mode.slice(1);
+  document.getElementById('sdots').innerHTML=Array(L.shots).fill(0).map((_,i)=>`<div class="sd ${i===0?'cur':''}"></div>`).join('');
   document.getElementById('strip-row').innerHTML='';
   document.getElementById('shutter').disabled=false;
   document.getElementById('shutter').style.opacity='1';
-
-  // Wait two animation frames — screen must be painted before camera starts
-  // This is what fixes the black screen
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-
   await startCam();
 }
+async function flipCam(){facing=facing==='user'?'environment':'user';await startCam();}
+function exitCam(){stopCam();go('s-home');}
 
-async function flipCam(){
-  facing=facing==='user'?'environment':'user';
-  await startCam();
-}
-function exitCam(){stopCam();go('s-attract');}
-
-// ─── CAPTURE ───
 async function doCapture(){
   if(capturing)return;
-  const L=LAYOUTS.find(l=>l.id===lay);
+  const L=LAYOUTS.find(l=>l.id===layout);
   if(captured.length>=L.shots)return;
   capturing=true;
   if(S.countdown>0)await runCD(S.countdown);
-  doFlash();playShutter();snapFrame();updateDots();
-  capturing=false;
+  doFlash();playShutter();snapFrame();updateDots();capturing=false;
   if(captured.length>=L.shots){
     document.getElementById('shutter').disabled=true;
     document.getElementById('shutter').style.opacity='0.3';
@@ -622,50 +874,22 @@ function snapFrame(){
   const url=c.toDataURL('image/jpeg',.92);
   captured.push(url);
   const row=document.getElementById('strip-row');
-  const d=document.createElement('div');d.className='sth';
-  d.innerHTML=`<img src="${url}">`;row.appendChild(d);
+  const d=document.createElement('div');d.className='sth';d.innerHTML=`<img src="${url}">`;row.appendChild(d);
 }
-function updateDots(){
-  document.querySelectorAll('.sd').forEach((d,i)=>{
-    d.classList.remove('done','cur');
-    if(i<captured.length)d.classList.add('done');
-    else if(i===captured.length)d.classList.add('cur');
-  });
-}
-function runCD(n){
-  return new Promise(res=>{
-    const wrap=document.getElementById('cdwrap'),num=document.getElementById('cdnum');
-    let c=n;wrap.classList.add('on');num.textContent=c;
-    const iv=setInterval(()=>{
-      c--;
-      if(c<=0){clearInterval(iv);wrap.classList.remove('on');res();}
-      else{num.textContent=c;num.style.animation='none';num.offsetHeight;num.style.animation='';}
-    },1000);
-  });
-}
-function doFlash(){
-  if(!S.flash)return;
-  const f=document.getElementById('flash');
-  f.style.display='block';f.style.opacity='1';
-  setTimeout(()=>{f.style.transition='opacity .3s';f.style.opacity='0';
-    setTimeout(()=>{f.style.display='none';f.style.transition='';},310);},40);
-}
-function playShutter(){
-  if(!S.sound)return;
-  try{const a=new(window.AudioContext||window.webkitAudioContext)();
-    const o=a.createOscillator(),g=a.createGain();
-    o.connect(g);g.connect(a.destination);o.frequency.value=1100;
-    g.gain.setValueAtTime(.25,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.07);
-    o.start();o.stop(a.currentTime+.07);}catch(e){}
-}
+function updateDots(){document.querySelectorAll('.sd').forEach((d,i)=>{d.classList.remove('done','cur');if(i<captured.length)d.classList.add('done');else if(i===captured.length)d.classList.add('cur');});}
+function runCD(n){return new Promise(res=>{const wrap=document.getElementById('cdwrap'),num=document.getElementById('cdnum');let c=n;wrap.classList.add('on');num.textContent=c;const iv=setInterval(()=>{c--;if(c<=0){clearInterval(iv);wrap.classList.remove('on');res();}else{num.textContent=c;num.style.animation='none';num.offsetHeight;num.style.animation='';}},1000);});}
+function doFlash(){if(!S.flash)return;const f=document.getElementById('flash');f.style.display='block';f.style.opacity='1';setTimeout(()=>{f.style.transition='opacity .3s';f.style.opacity='0';setTimeout(()=>{f.style.display='none';f.style.transition='';},310);},40);}
+function playShutter(){if(!S.sound)return;try{const a=new(window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=1100;g.gain.setValueAtTime(.25,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.07);o.start();o.stop(a.currentTime+.07);}catch(e){}}
 function cycleTimer(){const v=[0,3,5,10],i=v.indexOf(S.countdown);S.countdown=v[(i+1)%v.length];saveS();toast(`⏱ Timer: ${S.countdown===0?'Off':S.countdown+'s'}`);}
 function addSticker(){toast('😊 Sticker added!');}
 
-// ─── BUILD STRIP ───
+// ═══════════════════════════════════════════
+// STRIP BUILDER
+// ═══════════════════════════════════════════
 function buildStrip(){
   showL('Building your photo...');
   setTimeout(async()=>{
-    const L=LAYOUTS.find(l=>l.id===lay);
+    const L=LAYOUTS.find(l=>l.id===layout);
     const pw=600,ph=Math.round(pw*9/16),pad=14,brd=32;
     let cw,ch;
     if(L.cols===1){cw=pw+brd*2;ch=ph*L.rows+pad*(L.rows-1)+brd*2;}
@@ -673,120 +897,106 @@ function buildStrip(){
     const canvas=document.getElementById('rev-canvas');
     canvas.width=cw;canvas.height=ch;
     const ctx=canvas.getContext('2d');
-    if(S.borderColor==='rainbow'){
-      const gr=ctx.createLinearGradient(0,0,cw,ch);
-      gr.addColorStop(0,'#ff6b6b');gr.addColorStop(.33,'#ffd93d');
-      gr.addColorStop(.66,'#6bcb77');gr.addColorStop(1,'#4d96ff');
-      ctx.fillStyle=gr;
-    }else ctx.fillStyle=S.borderColor;
-    ctx.fillRect(0,0,cw,ch);
+    ctx.fillStyle=S.borderColor;ctx.fillRect(0,0,cw,ch);
     const loadImg=src=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src=src;});
     for(let i=0;i<captured.length;i++){
       const img=await loadImg(captured[i]);
       const col=i%L.cols,row=Math.floor(i/L.cols);
       const x=brd+col*(pw+pad),y=brd+row*(ph+pad);
-      ctx.save();ctx.beginPath();rr(ctx,x,y,pw,ph,6);ctx.clip();
-      ctx.drawImage(img,x,y,pw,ph);ctx.restore();
+      ctx.save();ctx.beginPath();rr(ctx,x,y,pw,ph,6);ctx.clip();ctx.drawImage(img,x,y,pw,ph);ctx.restore();
     }
-    if(S.eventName){
+    const ev=events[currentEventIdx];
+    if(S.showEventText&&ev&&ev.title){
       ctx.fillStyle=S.borderColor==='#000000'?'#ddd':'#444';
       ctx.font='bold 15px -apple-system,sans-serif';ctx.textAlign='center';
-      ctx.fillText(S.eventName,cw/2,ch-brd/2+4);
+      ctx.fillText(ev.title,cw/2,ch-brd/2+4);
     }
     if(S.logoUrl){const logo=await loadImg(S.logoUrl);const lw=80,lh=lw*(logo.height/logo.width);ctx.drawImage(logo,cw-lw-7,ch-lh-7,lw,lh);}
     if(S.frames&&S.frames.length){const fr=await loadImg(S.frames[0]);ctx.drawImage(fr,0,0,cw,ch);}
     hideL();stopCam();go('s-review');
     document.getElementById('shutter').disabled=false;
     const url=canvas.toDataURL('image/jpeg',.9);
-    gallery.unshift({url,date:new Date().toISOString()});
+    gallery.unshift({url,date:new Date().toISOString(),event:(ev&&ev.name)||''});
     try{localStorage.setItem('sb_g',JSON.stringify(gallery.slice(0,50)));}catch(e){}
-    if(S.autoreset){clearTimeout(autoTmr);autoTmr=setTimeout(newSess,15000);}
+    if(S.sharingTimeout>0){clearTimeout(autoTmr);autoTmr=setTimeout(newSess,S.sharingTimeout*1000);}
   },60);
 }
 function rr(ctx,x,y,w,h,r){ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
 
-// ─── SHARE ───
+// ═══════════════════════════════════════════
+// SHARE
+// ═══════════════════════════════════════════
 async function doShare(){
   const canvas=document.getElementById('rev-canvas');
   canvas.toBlob(async blob=>{
     const file=new File([blob],'snapbooth.jpg',{type:'image/jpeg'});
-    try{
-      if(navigator.share&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'My Photo'});toast('✅ Shared!','ok');}
-      else if(navigator.share){await navigator.share({title:'SnapBooth',text:'Check out my photo!'});}
-      else toast('Use Save button');
-    }catch(e){if(!String(e).includes('cancel'))toast('Cancelled');}
+    try{if(navigator.share&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'My Photo'});toast('✅ Shared!','ok');}else if(navigator.share){await navigator.share({title:'SnapBooth',text:'Check out my photo!'});}else toast('Use Save button');}
+    catch(e){if(!String(e).includes('cancel'))toast('Cancelled');}
   },'image/jpeg',.9);
 }
 function doSave(){const a=document.createElement('a');a.download=`snapbooth-${Date.now()}.jpg`;a.href=document.getElementById('rev-canvas').toDataURL('image/jpeg',.9);a.click();toast('💾 Saved!','ok');}
 function doPrint(){const url=document.getElementById('rev-canvas').toDataURL('image/jpeg',.95);const w=window.open('');w.document.write(`<html><head><style>*{margin:0}img{max-width:100vw;max-height:100vh}</style></head><body><img src="${url}" onload="window.print();window.close()"></body></html>`);w.document.close();toast('🖨️ Printing...','ok');}
 function doQR(){document.getElementById('m-qr').classList.add('on');drawQR();}
-function drawQR(){
-  const c=document.getElementById('qrc'),ctx=c.getContext('2d');
-  const s=190;ctx.fillStyle='#fff';ctx.fillRect(0,0,s,s);
-  let seed=54321;const rand=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
-  const cells=Math.floor(s/6);
-  const fp=(ox,oy)=>{ctx.fillStyle='#000';ctx.fillRect(ox*6,oy*6,42,42);ctx.fillStyle='#fff';ctx.fillRect(ox*6+6,oy*6+6,30,30);ctx.fillStyle='#000';ctx.fillRect(ox*6+12,oy*6+12,18,18);};
-  fp(0,0);fp(cells-7,0);fp(0,cells-7);
-  for(let r=0;r<cells;r++)for(let cc=0;cc<cells;cc++){const isF=(r<8&&cc<8)||(r<8&&cc>=cells-8)||(r>=cells-8&&cc<8);if(!isF&&rand()>.5){ctx.fillStyle='#000';ctx.fillRect(cc*6,r*6,5,5);}}
-  ctx.fillStyle='#fff';ctx.fillRect(s/2-20,s/2-13,40,26);ctx.fillStyle='#c8f135';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText('SNAP',s/2,s/2-1);ctx.fillText('BOOTH',s/2,s/2+10);
-}
+function drawQR(){const c=document.getElementById('qrc'),ctx=c.getContext('2d');const s=190;ctx.fillStyle='#fff';ctx.fillRect(0,0,s,s);let seed=54321;const rand=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};const cells=Math.floor(s/6);const fp=(ox,oy)=>{ctx.fillStyle='#000';ctx.fillRect(ox*6,oy*6,42,42);ctx.fillStyle='#fff';ctx.fillRect(ox*6+6,oy*6+6,30,30);ctx.fillStyle='#000';ctx.fillRect(ox*6+12,oy*6+12,18,18);};fp(0,0);fp(cells-7,0);fp(0,cells-7);for(let r=0;r<cells;r++)for(let cc=0;cc<cells;cc++){const isF=(r<8&&cc<8)||(r<8&&cc>=cells-8)||(r>=cells-8&&cc<8);if(!isF&&rand()>.5){ctx.fillStyle='#000';ctx.fillRect(cc*6,r*6,5,5);}}ctx.fillStyle='#fff';ctx.fillRect(s/2-20,s/2-13,40,26);ctx.fillStyle='#e8356d';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText('SNAP',s/2,s/2-1);ctx.fillText('BOOTH',s/2,s/2+10);}
 function retake(){clearTimeout(autoTmr);beginCap();}
-function newSess(){clearTimeout(autoTmr);captured=[];go('s-attract');}
+function newSess(){clearTimeout(autoTmr);captured=[];go('s-home');}
 
-// ─── GALLERY ───
-function renderGal(){
-  const grid=document.getElementById('ggrid'),empty=document.getElementById('gempty');
-  if(!gallery.length){grid.innerHTML='';empty.style.display='flex';return;}
-  empty.style.display='none';
-  grid.innerHTML=gallery.map((item,i)=>`<div class="gi" onclick="viewGal(${i})"><img src="${item.url}" loading="lazy"></div>`).join('');
-}
-function viewGal(i){
-  const canvas=document.getElementById('rev-canvas');
-  const img=new Image();
-  img.onload=()=>{canvas.width=img.width;canvas.height=img.height;canvas.getContext('2d').drawImage(img,0,0);go('s-review');};
-  img.src=gallery[i].url;
-}
+// ═══════════════════════════════════════════
+// GALLERY
+// ═══════════════════════════════════════════
+function renderGal(){const grid=document.getElementById('ggrid'),empty=document.getElementById('gempty');if(!gallery.length){grid.innerHTML='';empty.style.display='flex';return;}empty.style.display='none';grid.innerHTML=gallery.map((item,i)=>`<div class="gi" onclick="viewGal(${i})"><img src="${item.url}" loading="lazy"></div>`).join('');}
+function viewGal(i){const canvas=document.getElementById('rev-canvas');const img=new Image();img.onload=()=>{canvas.width=img.width;canvas.height=img.height;canvas.getContext('2d').drawImage(img,0,0);go('s-review');};img.src=gallery[i].url;}
 function clearGal(){if(!confirm('Delete all photos?'))return;gallery=[];try{localStorage.removeItem('sb_g');}catch(e){}renderGal();toast('🗑️ Cleared');}
 
-// ─── SETTINGS ───
-function saveS(){try{localStorage.setItem('sb_s',JSON.stringify(S));}catch(e){}}
-function togS(k){S[k]=!S[k];document.getElementById('tog-'+k).classList.toggle('on',S[k]);saveS();}
-function setCD(v,el){S.countdown=v;document.querySelectorAll('.topt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');saveS();}
-function setBC(c,el){S.borderColor=c;document.querySelectorAll('.co').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');saveS();}
-function ev(key,label){
-  const v=prompt(label+':',S[key]||'');if(v===null)return;
-  if(key==='passcode'){const c=v.replace(/\D/g,'').slice(0,4);if(c.length!==4){toast('4 digits required');return;}S[key]=c;}
-  else S[key]=v;
-  const el=document.getElementById('sv-'+key);if(el)el.textContent=v||'Not set';
-  if(key==='appName'||key==='tagline')applyBranding();
-  saveS();
-}
-function upLogo(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{S.logoUrl=e.target.result;const p=document.getElementById('lprev');p.src=e.target.result;p.style.display='block';saveS();toast('✅ Logo uploaded','ok');};r.readAsDataURL(f);}
-function upFrames(inp){Array.from(inp.files).forEach(f=>{const r=new FileReader();r.onload=e=>{S.frames.push(e.target.result);const img=document.createElement('img');img.src=e.target.result;img.className='fth';img.onclick=()=>{document.querySelectorAll('.fth').forEach(t=>t.classList.remove('sel'));img.classList.add('sel');S.frames=[e.target.result,...S.frames.filter(x=>x!==e.target.result)];saveS();};document.getElementById('fthumbs').appendChild(img);saveS();};r.readAsDataURL(f);});toast('✅ Frames uploaded','ok');}
+// ═══════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════
+function saveS(){try{localStorage.setItem('sb_s2',JSON.stringify(S));}catch(e){}}
+function togS(k){S[k]=!S[k];const el=document.getElementById('tog-'+k);if(el)el.classList.toggle('on',S[k]);saveS();}
+function setCD(v,el){S.countdown=v;document.querySelectorAll('#s-settings .chip').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');saveS();}
+function setST(v,el){S.sharingTimeout=v;el.parentElement.querySelectorAll('.chip').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');saveS();}
+function adjustNum(key,delta){S[key]=Math.max(0,S[key]+delta);document.getElementById('val-'+key).textContent=S[key];saveS();}
+function evEdit(key,label){const v=prompt(label+':',S[key]||'');if(v===null)return;if(key==='passcode'){const c=v.replace(/\D/g,'').slice(0,4);if(c.length!==4){toast('4 digits required');return;}S[key]=c;}else S[key]=v;saveS();}
+function upLogo(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{S.logoUrl=e.target.result;events[currentEventIdx].logoUrl=e.target.result;const p=document.getElementById('logo-prev');if(p){p.src=e.target.result;p.style.display='block';}saveS();saveEvents();toast('✅ Logo uploaded','ok');};r.readAsDataURL(f);}
+function upFrames(inp){Array.from(inp.files).forEach(f=>{const r=new FileReader();r.onload=e=>{S.frames.push(e.target.result);const img=document.createElement('img');img.src=e.target.result;img.style.cssText='width:56px;height:56px;border-radius:7px;object-fit:cover;border:2px solid rgba(255,255,255,.1);cursor:pointer';img.onclick=()=>{S.frames=[e.target.result,...S.frames.filter(x=>x!==e.target.result)];saveS();};document.getElementById('frame-thumbs').appendChild(img);saveS();};r.readAsDataURL(f);});toast('✅ Frames uploaded','ok');}
 function resetAll(){if(!confirm('Reset all settings?'))return;localStorage.clear();location.reload();}
-function applyBranding(){document.getElementById('lbl-logo').textContent=S.appName||'SnapBooth';document.getElementById('lbl-tag').textContent=S.tagline||'Tap anywhere to start';}
-applyBranding();
 function initUI(){
-  ['appName','eventName','tagline'].forEach(k=>{const e=document.getElementById('sv-'+k);if(e)e.textContent=S[k]||'Not set';});
-  ['mirror','flash','sound','autoreset','kioskLock'].forEach(k=>{const e=document.getElementById('tog-'+k);if(e)e.classList.toggle('on',!!S[k]);});
-  if(S.logoUrl){const p=document.getElementById('lprev');p.src=S.logoUrl;p.style.display='block';}
-  document.querySelectorAll('.co').forEach(o=>o.classList.toggle('sel',o.dataset.c===S.borderColor));
-  if(S.frames)S.frames.forEach(f=>{const img=document.createElement('img');img.src=f;img.className='fth';document.getElementById('fthumbs').appendChild(img);});
+  ['mirror','flash','sound','kioskLock','autoPrint','showPrint','showAirdrop','showQR','showOriginals','showDelete','showEventText','showDate'].forEach(k=>{const e=document.getElementById('tog-'+k);if(e)e.classList.toggle('on',!!S[k]);});
+  document.getElementById('val-maxCopies').textContent=S.maxCopies;
+  document.getElementById('val-maxPrints').textContent=S.maxPrints;
+  if(S.logoUrl){const p=document.getElementById('logo-prev');if(p){p.src=S.logoUrl;p.style.display='block';}}
+  if(S.frames)S.frames.forEach(f=>{const img=document.createElement('img');img.src=f;img.style.cssText='width:56px;height:56px;border-radius:7px;object-fit:cover;border:2px solid rgba(255,255,255,.1);cursor:pointer';document.getElementById('frame-thumbs').appendChild(img);});
 }
 initUI();
 
-// ─── PASSCODE ───
-function openPass(cb){passEntry='';passCB=cb;updPD();document.getElementById('m-pass').classList.add('on');}
+// Render layout editor presets
+document.getElementById('layout-presets').innerHTML=LAYOUTS.map(l=>{
+  const boxes=Array(l.shots).fill(0).map(()=>{const w=l.cols===1?42:l.cols===2?30:22,h=l.rows<=2?34:l.rows===3?22:16;return `<div class="ppb" style="width:${w}px;height:${h}px"></div>`;}).join('');
+  const dir=l.cols===1?'column':'row',wrap=l.cols>1?'flex-wrap:wrap':'';
+  return `<div class="preset-card ${l.id===layout?'sel':''}" onclick="selLayout('${l.id}',this)">
+    <div class="preset-prev" style="flex-direction:${dir};${wrap};gap:2px">${boxes}</div>
+    <h4>${l.name}</h4><small>${l.desc}</small></div>`;
+}).join('');
+
+// ═══════════════════════════════════════════
+// PASSCODE
+// ═══════════════════════════════════════════
+function openPass(cb){passEntry='';passCB=cb;updPD();openM('m-pass');}
+function openM(id){document.getElementById(id).classList.add('on');}
 function closeM(id){document.getElementById(id).classList.remove('on');passEntry='';}
 function np(n){if(passEntry.length>=4)return;passEntry+=n;updPD();if(passEntry.length===4)setTimeout(()=>{if(passEntry===S.passcode){closeM('m-pass');if(passCB)passCB();}else{toast('❌ Wrong passcode');passEntry='';updPD();}},200);}
 function npDel(){passEntry=passEntry.slice(0,-1);updPD();}
 function updPD(){document.querySelectorAll('.pd').forEach((d,i)=>d.classList.toggle('on',i<passEntry.length));}
 
-// ─── TOAST / LOADER ───
+// ═══════════════════════════════════════════
+// TOAST / LOADER
+// ═══════════════════════════════════════════
 function toast(msg,cls=''){const c=document.getElementById('toasts'),d=document.createElement('div');d.className='toast'+(cls?' '+cls:'');d.textContent=msg;c.appendChild(d);setTimeout(()=>d.remove(),3000);}
 function showL(msg){document.getElementById('ltxt').textContent=msg||'Processing...';document.getElementById('loader').classList.add('on');}
 function hideL(){document.getElementById('loader').classList.remove('on');}
 
+// Init
+renderEvents();
 try{if('wakeLock' in navigator)navigator.wakeLock.request('screen');}catch(e){}
 </script>
 </body>
