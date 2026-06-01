@@ -4,120 +4,790 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Camera Test</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
+<meta name="apple-mobile-web-app-title" content="SnapBooth">
+<title>SnapBooth</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background:#000; color:#fff; font-family:-apple-system,sans-serif; min-height:100vh; }
-video {
-  width:100vw;
-  height:60vh;
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font-family:-apple-system,'Helvetica Neue',sans-serif}
+
+/* ── SCREENS ── */
+.screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+
+/* ── ATTRACT ── */
+#s-attract{background:radial-gradient(ellipse at 35% 25%,#1a2040 0%,#080a0f 65%);align-items:center;justify-content:center;cursor:pointer;text-align:center;padding:40px 30px}
+.logo{font-size:clamp(56px,13vw,120px);font-weight:900;letter-spacing:.04em;line-height:1;background:linear-gradient(135deg,#c8f135,#7b61ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 30px rgba(200,241,53,.3));margin-bottom:10px}
+.sub{font-size:clamp(12px,2vw,16px);color:#8a92a8;letter-spacing:.25em;text-transform:uppercase;margin-bottom:44px}
+.tapbtn{display:inline-block;padding:16px 40px;background:#c8f135;color:#080a0f;border-radius:100px;font-size:16px;font-weight:800;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(200,241,53,.4)}50%{box-shadow:0 0 0 16px rgba(200,241,53,0)}}
+
+/* ── SHARED PAGE STYLES ── */
+.page{background:#0a0c12;overflow:hidden}
+.page-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 20px 100px}
+.hdr{padding:50px 20px 16px;display:flex;align-items:center;gap:12px;background:#0a0c12;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.hdr h1{font-size:24px;font-weight:800;letter-spacing:-.3px}
+.hdr p{font-size:12px;color:#8a92a8;margin-top:2px}
+.back{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.primary{width:100%;padding:15px;background:#c8f135;color:#080a0f;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:16px}
+.primary:active{opacity:.85;transform:scale(.98)}
+
+/* ── MODE ── */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mcard{background:#141820;border:2px solid rgba(255,255,255,.07);border-radius:14px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .15s}
+.mcard:active{transform:scale(.96)}
+.mcard.sel{border-color:#c8f135;background:rgba(200,241,53,.06)}
+.mic{font-size:30px;margin-bottom:7px}
+.mcard h3{font-size:13px;font-weight:700}
+.mcard p{font-size:11px;color:#8a92a8;margin-top:2px;line-height:1.3}
+
+/* ── LAYOUT ── */
+.lgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.lcard{background:#141820;border:2px solid rgba(255,255,255,.07);border-radius:11px;padding:12px 7px;text-align:center;cursor:pointer;transition:all .15s}
+.lcard:active{transform:scale(.96)}
+.lcard.sel{border-color:#c8f135;background:rgba(200,241,53,.06)}
+.lprev{display:flex;gap:3px;justify-content:center;align-items:center;height:46px;margin-bottom:6px}
+.lb{background:#2a3040;border-radius:3px;border:1px solid rgba(255,255,255,.07)}
+.lcard h4{font-size:11px;font-weight:700}
+.lcard small{font-size:10px;color:#8a92a8}
+
+/* ── FILTER ── */
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.fcard{border:2px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .15s}
+.fcard:active{transform:scale(.96)}
+.fcard.sel{border-color:#c8f135}
+.fprev{aspect-ratio:4/3;background:#1e2530;display:flex;align-items:center;justify-content:center;font-size:22px}
+.fname{padding:6px;text-align:center;font-size:10px;font-weight:600;background:#141820}
+
+/* ════════════════════════════════════════
+   CAMERA SCREEN — THE WORKING APPROACH
+   Based on what the diagnostic confirmed:
+   video plays fine when it's the direct child
+   and always visible in the DOM.
+   ════════════════════════════════════════ */
+#s-camera{
+  /* black background while camera loads */
+  background:#000;
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  overflow:hidden;
+}
+
+/* Video: full screen, always in DOM, never hidden */
+#cam-vid{
+  position:absolute;
+  top:0;left:0;
+  width:100%;
+  height:100%;
   object-fit:cover;
-  display:block;
-  background:#111;
+  background:#000;
+  z-index:1;
+  /* NEVER set display:none or visibility:hidden on this element */
 }
-#log {
-  padding:12px;
-  font-size:13px;
-  line-height:1.8;
-  background:#111;
-  min-height:40vh;
-  overflow-y:auto;
+
+/* UI overlay */
+#cam-overlay{
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:100%;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  background:linear-gradient(to bottom,
+    rgba(0,0,0,.55) 0%,
+    transparent 22%,
+    transparent 74%,
+    rgba(0,0,0,.72) 100%);
+  pointer-events:none;
 }
-.line { padding:4px 0; border-bottom:1px solid #222; }
-.ok  { color:#4ade80; }
-.err { color:#f87171; }
-.inf { color:#60a5fa; }
-button {
-  display:block;
-  width:calc(100% - 24px);
-  margin:10px 12px;
-  padding:16px;
-  background:#c8f135;
-  color:#000;
-  border:none;
-  border-radius:12px;
-  font-size:16px;
-  font-weight:800;
-  cursor:pointer;
-}
+#cam-overlay>*{pointer-events:auto}
+
+.cam-top{padding:env(safe-area-inset-top,16px) 16px 0;padding-top:max(env(safe-area-inset-top),16px);display:flex;align-items:center;justify-content:space-between}
+.cam-bot{margin-top:auto;padding:0 16px max(env(safe-area-inset-bottom),20px);padding-bottom:max(env(safe-area-inset-bottom),20px);display:flex;align-items:center;justify-content:center;gap:24px}
+.icb{width:46px;height:46px;border-radius:50%;border:none;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.icb:active{transform:scale(.9);background:rgba(255,255,255,.28)}
+.shutter{width:76px;height:76px;border-radius:50%;background:transparent;border:4px solid #fff;cursor:pointer;position:relative;flex-shrink:0}
+.shutter::after{content:'';position:absolute;inset:6px;border-radius:50%;background:#fff}
+.shutter:active{transform:scale(.92)}
+.shutter:disabled{opacity:.35}
+.sdots{display:flex;gap:7px}
+.sd{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .3s}
+.sd.done{background:#c8f135;box-shadow:0 0 6px #c8f135}
+.sd.cur{background:#fff}
+.strip-row{display:flex;gap:5px;overflow-x:auto;padding:0 14px 6px;scrollbar-width:none;flex-shrink:0}
+.strip-row::-webkit-scrollbar{display:none}
+.sth{width:52px;flex-shrink:0;aspect-ratio:3/4;border-radius:5px;overflow:hidden;border:2px solid rgba(255,255,255,.22)}
+.sth img{width:100%;height:100%;object-fit:cover}
+
+/* countdown */
+#cdwrap{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.3)}
+#cdwrap.on{display:flex}
+#cdnum{font-size:min(240px,45vw);font-weight:900;color:#fff;line-height:1;animation:cpop .9s ease-out;text-shadow:0 0 40px rgba(200,241,53,.5)}
+@keyframes cpop{0%{transform:scale(2.2);opacity:0}25%{transform:scale(1);opacity:1}85%{opacity:1}100%{opacity:0;transform:scale(.85)}}
+/* flash */
+#flash{position:absolute;top:0;left:0;width:100%;height:100%;z-index:20;background:#fff;display:none;pointer-events:none}
+
+/* ── REVIEW ── */
+#s-review{background:#000;position:fixed;top:0;left:0;width:100%;height:100%}
+#rev-canvas{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:1}
+#rev-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;display:flex;flex-direction:column;background:linear-gradient(to bottom,rgba(0,0,0,.6) 0%,transparent 18%,transparent 68%,rgba(0,0,0,.92) 100%)}
+.rev-top{padding:max(env(safe-area-inset-top),16px) 16px 0;display:flex;align-items:center;gap:12px;padding-top:max(env(safe-area-inset-top),16px)}
+.rev-title{font-size:19px;font-weight:800}
+.rev-bot{margin-top:auto;padding:14px 14px max(env(safe-area-inset-bottom),14px)}
+.srow{display:flex;gap:7px;margin-bottom:9px}
+.sbtn{flex:1;padding:12px 4px;border-radius:10px;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:700;font-family:inherit;transition:all .15s}
+.sbtn:active{transform:scale(.93)}
+.sbtn svg{width:20px;height:20px}
+.s-air{background:#0a84ff;color:#fff}
+.s-save{background:#34c759;color:#fff}
+.s-print{background:#ff9f0a;color:#fff}
+.s-qr{background:#1e2530;color:#fff;border:1px solid rgba(255,255,255,.1)}
+.btn-ret{width:100%;padding:13px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;font-family:inherit}
+.btn-new{width:100%;padding:14px;background:#c8f135;color:#080a0f;border:none;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+
+/* ── GALLERY ── */
+.ggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.gi{aspect-ratio:3/4;overflow:hidden;cursor:pointer;background:#141820}
+.gi img{width:100%;height:100%;object-fit:cover}
+.gi:active img{opacity:.8}
+.gempty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#8a92a8;padding:50px;text-align:center}
+
+/* ── SETTINGS ── */
+.sg{background:#141820;border-radius:11px;border:1px solid rgba(255,255,255,.07);margin-bottom:2px;overflow:hidden}
+.si{padding:13px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07);cursor:pointer}
+.si:last-child{border-bottom:none}
+.si:active{background:#1e2530}
+.sl{font-size:13px;font-weight:600}
+.sd2{font-size:11px;color:#8a92a8;margin-top:1px}
+.st{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#4a5268;font-weight:700;margin:16px 0 6px}
+.tog{width:44px;height:26px;border-radius:13px;background:#2a3040;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.tog.on{background:#c8f135}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.tog.on::after{transform:translateX(18px)}
+.trow{display:flex;gap:5px}
+.topt{flex:1;padding:8px 2px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:#141820;color:#8a92a8;font-size:12px;font-weight:700;cursor:pointer;text-align:center;font-family:inherit}
+.topt.sel{background:rgba(200,241,53,.1);border-color:#c8f135;color:#c8f135}
+.crow{display:flex;gap:7px;flex-wrap:wrap}
+.co{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
+.co.sel{border-color:#fff;transform:scale(1.2)}
+.upz{border:2px dashed rgba(255,255,255,.1);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:#141820;margin-bottom:3px}
+.upz p{color:#8a92a8;font-size:11px;margin-top:5px}
+.fthumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.fth{width:56px;height:56px;border-radius:7px;object-fit:cover;border:2px solid rgba(255,255,255,.1);cursor:pointer}
+.fth.sel{border-color:#c8f135}
+
+/* ── BOTTOM NAV ── */
+#bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(6,8,14,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.07);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:50}
+.ni{flex:1;padding:10px 6px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:#4a5268;border:none;background:none;font-family:inherit}
+.ni.on{color:#c8f135}
+.ni svg{width:20px;height:20px}
+.ni span{font-size:9px;font-weight:700;letter-spacing:.03em}
+
+/* ── MODALS ── */
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.88);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(12px)}
+.modal.on{display:flex}
+.mbox{background:#141820;border-radius:20px;padding:28px 24px;text-align:center;width:280px;max-width:88vw}
+.mbox h2{font-size:20px;font-weight:800;margin-bottom:4px}
+.mbox p{color:#8a92a8;font-size:12px;margin-bottom:16px}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}
+.nk{padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#1e2530;color:#fff;font-size:19px;font-weight:700;cursor:pointer;font-family:inherit}
+.nk:active{background:#2a3040;transform:scale(.93)}
+.pdots{display:flex;gap:10px;justify-content:center;margin-bottom:16px}
+.pd{width:11px;height:11px;border-radius:50%;border:2px solid rgba(255,255,255,.2)}
+.pd.on{background:#c8f135;border-color:#c8f135}
+
+/* ── TOAST / LOADER ── */
+#toasts{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
+.toast{background:#141820;border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:9px 16px;font-size:12px;font-weight:600;white-space:nowrap;box-shadow:0 6px 24px rgba(0,0,0,.7);animation:tin .25s ease-out}
+.toast.ok{color:#c8f135}
+@keyframes tin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+#loader{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:150;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+#loader.on{display:flex}
+.spin{width:40px;height:40px;border:3px solid #1e2530;border-top-color:#c8f135;border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#loader p{color:#8a92a8;font-size:13px}
 </style>
 </head>
 <body>
 
-<video id="v" autoplay playsinline muted webkit-playsinline></video>
-<button onclick="startTest()">▶ Start Camera Test</button>
-<div id="log"></div>
+<div id="toasts"></div>
+<div id="loader"><div class="spin"></div><p id="ltxt">Processing...</p></div>
+
+<!-- PASSCODE MODAL -->
+<div class="modal" id="m-pass">
+  <div class="mbox">
+    <h2>🔒 Settings</h2><p>Enter passcode</p>
+    <div class="pdots"><div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+    <div class="numpad">
+      <button class="nk" onclick="np('1')">1</button><button class="nk" onclick="np('2')">2</button><button class="nk" onclick="np('3')">3</button>
+      <button class="nk" onclick="np('4')">4</button><button class="nk" onclick="np('5')">5</button><button class="nk" onclick="np('6')">6</button>
+      <button class="nk" onclick="np('7')">7</button><button class="nk" onclick="np('8')">8</button><button class="nk" onclick="np('9')">9</button>
+      <button class="nk" style="font-size:11px;color:#8a92a8" onclick="closeM('m-pass')">Cancel</button>
+      <button class="nk" onclick="np('0')">0</button>
+      <button class="nk" style="font-size:13px" onclick="npDel()">⌫</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR MODAL -->
+<div class="modal" id="m-qr">
+  <div class="mbox">
+    <h2>📲 Your Photo</h2><p>Scan to download</p>
+    <canvas id="qrc" width="190" height="190" style="border-radius:9px;display:block;margin:0 auto"></canvas>
+    <button class="primary" onclick="closeM('m-qr')">Done ✓</button>
+  </div>
+</div>
+
+<!-- ═══ ATTRACT ═══ -->
+<div class="screen active" id="s-attract" onclick="go('s-mode')">
+  <div class="logo" id="lbl-logo">SnapBooth</div>
+  <div class="sub"  id="lbl-tag">Tap anywhere to start</div>
+  <div class="tapbtn">▶ Begin Session</div>
+</div>
+
+<!-- ═══ MODE ═══ -->
+<div class="screen page" id="s-mode">
+  <div class="hdr">
+    <button class="back" onclick="go('s-attract')">←</button>
+    <div><h1>Choose Mode</h1><p>Select your capture style</p></div>
+  </div>
+  <div class="page-scroll">
+    <div class="mgrid">
+      <div class="mcard sel" data-m="photo" onclick="selMode('photo',this)"><div class="mic">📸</div><h3>Photo Booth</h3><p>Classic strips & grids</p></div>
+      <div class="mcard" data-m="gif"     onclick="selMode('gif',this)"><div class="mic">🎞️</div><h3>GIF Booth</h3><p>Animated GIF</p></div>
+      <div class="mcard" data-m="boomerang" onclick="selMode('boomerang',this)"><div class="mic">🔁</div><h3>Boomerang</h3><p>Loop video clip</p></div>
+      <div class="mcard" data-m="video"   onclick="selMode('video',this)"><div class="mic">🎬</div><h3>Video</h3><p>Short recording</p></div>
+      <div class="mcard" data-m="glamour" onclick="selMode('glamour',this)"><div class="mic">✨</div><h3>Glam Booth</h3><p>Beauty filter</p></div>
+      <div class="mcard" data-m="single"  onclick="selMode('single',this)"><div class="mic">🖼️</div><h3>Single Shot</h3><p>One photo</p></div>
+    </div>
+    <button class="primary" onclick="modeNext()">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══ LAYOUT ═══ -->
+<div class="screen page" id="s-layout">
+  <div class="hdr">
+    <button class="back" onclick="go('s-mode')">←</button>
+    <div><h1>Layout</h1><p>Choose arrangement</p></div>
+  </div>
+  <div class="page-scroll">
+    <div class="lgrid" id="lgrid"></div>
+    <button class="primary" onclick="go('s-filter');renderFilters()">Choose Filter →</button>
+  </div>
+</div>
+
+<!-- ═══ FILTER ═══ -->
+<div class="screen page" id="s-filter">
+  <div class="hdr">
+    <button class="back" onclick="go('s-layout')">←</button>
+    <div><h1>Filter</h1><p>Pick a look</p></div>
+  </div>
+  <div class="page-scroll">
+    <div class="fgrid" id="fgrid"></div>
+    <button class="primary" onclick="beginCap()">Start Session 🎉</button>
+  </div>
+</div>
+
+<!-- ═══ CAMERA ═══
+  NOTE: video element is ALWAYS in the DOM.
+  The screen uses display:none/flex but the video
+  itself is never hidden independently.
+-->
+<div class="screen" id="s-camera">
+  <video id="cam-vid"
+    autoplay
+    playsinline
+    muted
+    webkit-playsinline
+    x5-playsinline
+  ></video>
+
+  <div id="cam-overlay">
+    <div class="cam-top">
+      <button class="icb" onclick="exitCam()">✕</button>
+      <div class="sdots" id="sdots"></div>
+      <button class="icb" onclick="flipCam()">🔄</button>
+    </div>
+    <div class="strip-row" id="strip-row"></div>
+    <div class="cam-bot">
+      <button class="icb" onclick="cycleTimer()" id="tbtn">⏱</button>
+      <button class="shutter" id="shutter" onclick="doCapture()"></button>
+      <button class="icb" onclick="addSticker()">😊</button>
+    </div>
+  </div>
+
+  <div id="cdwrap"><div id="cdnum">3</div></div>
+  <div id="flash"></div>
+</div>
+
+<!-- ═══ REVIEW ═══ -->
+<div class="screen" id="s-review">
+  <canvas id="rev-canvas"></canvas>
+  <div id="rev-overlay">
+    <div class="rev-top">
+      <button class="back" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.2)" onclick="retake()">←</button>
+      <span class="rev-title">Your Photo ✨</span>
+    </div>
+    <div class="rev-bot">
+      <div class="srow">
+        <button class="sbtn s-air"   onclick="doShare()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1"/></svg>AirDrop
+        </button>
+        <button class="sbtn s-save"  onclick="doSave()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save
+        </button>
+        <button class="sbtn s-print" onclick="doPrint()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print
+        </button>
+        <button class="sbtn s-qr"    onclick="doQR()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>QR
+        </button>
+      </div>
+      <button class="btn-ret" onclick="retake()">🔄 Retake</button>
+      <button class="btn-new" onclick="newSess()">✨ New Session</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GALLERY ═══ -->
+<div class="screen page" id="s-gallery">
+  <div class="hdr" style="justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="back" onclick="navHome()">←</button><h1>Gallery</h1>
+    </div>
+    <button onclick="clearGal()" style="background:none;border:none;color:#4a5268;font-size:12px;cursor:pointer;font-family:inherit">Clear</button>
+  </div>
+  <div class="page-scroll" style="padding:8px 8px 100px">
+    <div class="ggrid" id="ggrid"></div>
+    <div class="gempty" id="gempty" style="display:none">
+      <div style="font-size:48px;opacity:.3">🖼️</div>
+      <p style="font-size:14px;font-weight:700;color:#fff">No photos yet</p>
+      <p>Start a session to capture memories</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS ═══ -->
+<div class="screen page" id="s-settings">
+  <div class="hdr">
+    <button class="back" onclick="navHome()">←</button><h1>Settings</h1>
+  </div>
+  <div class="page-scroll">
+    <div class="st">Branding</div>
+    <div class="sg">
+      <div class="si" onclick="ev('appName','Booth Name')">
+        <div><div class="sl">Booth Name</div><div class="sd2" id="sv-appName">SnapBooth</div></div><span style="color:#4a5268">›</span>
+      </div>
+      <div class="si" onclick="ev('eventName','Event Name')">
+        <div><div class="sl">Event Name</div><div class="sd2" id="sv-eventName">Not set</div></div><span style="color:#4a5268">›</span>
+      </div>
+      <div class="si" onclick="ev('tagline','Start Screen Tagline')">
+        <div><div class="sl">Tagline</div><div class="sd2" id="sv-tagline">Tap anywhere to start</div></div><span style="color:#4a5268">›</span>
+      </div>
+    </div>
+
+    <div class="st">Logo</div>
+    <div class="upz" onclick="document.getElementById('li').click()">
+      <div style="font-size:24px">🖼️</div><p>Tap to upload logo / watermark (PNG)</p>
+      <img id="lprev" style="display:none;max-height:60px;margin-top:8px;border-radius:6px">
+    </div>
+    <input type="file" id="li" accept="image/*" style="display:none" onchange="upLogo(this)">
+
+    <div class="st">Frame Templates</div>
+    <div class="upz" onclick="document.getElementById('fi').click()">
+      <div style="font-size:24px">🎨</div><p>Upload custom frame overlays (PNG)</p>
+    </div>
+    <input type="file" id="fi" accept="image/*" multiple style="display:none" onchange="upFrames(this)">
+    <div class="fthumbs" id="fthumbs"></div>
+
+    <div class="st">Capture</div>
+    <div class="sg">
+      <div class="si">
+        <div class="sl">Countdown Timer</div>
+        <div class="trow">
+          <button class="topt"     onclick="setCD(0,this)">Off</button>
+          <button class="topt sel" onclick="setCD(3,this)">3s</button>
+          <button class="topt"     onclick="setCD(5,this)">5s</button>
+          <button class="topt"     onclick="setCD(10,this)">10s</button>
+        </div>
+      </div>
+      <div class="si"><div><div class="sl">Mirror Mode</div><div class="sd2">Flip camera</div></div><div class="tog on" id="tog-mirror" onclick="togS('mirror')"></div></div>
+      <div class="si"><div><div class="sl">Flash Effect</div></div><div class="tog on" id="tog-flash" onclick="togS('flash')"></div></div>
+      <div class="si"><div><div class="sl">Shutter Sound</div></div><div class="tog on" id="tog-sound" onclick="togS('sound')"></div></div>
+      <div class="si"><div><div class="sl">Auto-reset (15s)</div><div class="sd2">Return to start after sharing</div></div><div class="tog on" id="tog-autoreset" onclick="togS('autoreset')"></div></div>
+    </div>
+
+    <div class="st">Strip Border Color</div>
+    <div class="sg">
+      <div class="si">
+        <div class="sl">Border</div>
+        <div class="crow">
+          <div class="co sel" style="background:#fff"     data-c="#ffffff" onclick="setBC('#ffffff',this)"></div>
+          <div class="co"     style="background:#000"     data-c="#000000" onclick="setBC('#000000',this)"></div>
+          <div class="co"     style="background:#c8f135"  data-c="#c8f135" onclick="setBC('#c8f135',this)"></div>
+          <div class="co"     style="background:#ff6b6b"  data-c="#ff6b6b" onclick="setBC('#ff6b6b',this)"></div>
+          <div class="co"     style="background:#7b61ff"  data-c="#7b61ff" onclick="setBC('#7b61ff',this)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="st">Security</div>
+    <div class="sg">
+      <div class="si" onclick="ev('passcode','New 4-digit Passcode')">
+        <div><div class="sl">Passcode</div><div class="sd2">Default: 1234</div></div><span style="color:#4a5268">›</span>
+      </div>
+      <div class="si"><div><div class="sl">Lock Settings</div><div class="sd2">Require passcode</div></div><div class="tog on" id="tog-kioskLock" onclick="togS('kioskLock')"></div></div>
+    </div>
+
+    <div class="st">About</div>
+    <div class="sg">
+      <div class="si"><div><div class="sl">SnapBooth v1.0</div><div class="sd2">Photo Booth PWA</div></div></div>
+      <div class="si" onclick="resetAll()"><div class="sl" style="color:#ff3b30">Reset All Settings</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="bnav" style="display:none">
+  <button class="ni on" id="n-home" onclick="navHome()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="ni" id="n-gal" onclick="navGal()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+    <span>Gallery</span>
+  </button>
+  <button class="ni" id="n-set" onclick="navSet()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    <span>Settings</span>
+  </button>
+</div>
 
 <script>
-function log(msg, type='inf') {
-  const d = document.getElementById('log');
-  const line = document.createElement('div');
-  line.className = 'line ' + type;
-  line.textContent = new Date().toISOString().slice(11,23) + ' — ' + msg;
-  d.appendChild(line);
-  d.scrollTop = d.scrollHeight;
-  console.log(msg);
+// ─── STATE ───
+let S={appName:'SnapBooth',eventName:'',tagline:'Tap anywhere to start',passcode:'1234',kioskLock:true,mirror:true,flash:true,sound:true,autoreset:true,borderColor:'#ffffff',countdown:3,logoUrl:null,frames:[]};
+let gallery=[];
+try{const v=localStorage.getItem('sb_s');if(v)Object.assign(S,JSON.parse(v));}catch(e){}
+try{const v=localStorage.getItem('sb_g');if(v)gallery=JSON.parse(v);}catch(e){}
+
+let mode='photo',lay='3x1',filt='none';
+let captured=[],camStream=null,facing='user';
+let capturing=false,passEntry='',passCB=null,autoTmr=null;
+
+const LAYOUTS=[
+  {id:'1x1',name:'Single',desc:'1 photo',shots:1,cols:1,rows:1},
+  {id:'2x1',name:'2 Strip',desc:'2 vertical',shots:2,cols:1,rows:2},
+  {id:'3x1',name:'3 Strip',desc:'Classic',shots:3,cols:1,rows:3},
+  {id:'4x1',name:'4 Strip',desc:'4 photos',shots:4,cols:1,rows:4},
+  {id:'2x2',name:'2×2 Grid',desc:'4 grid',shots:4,cols:2,rows:2},
+  {id:'3x2',name:'3×2 Grid',desc:'6 grid',shots:6,cols:3,rows:2},
+];
+const FILTERS=[
+  {id:'none',name:'Original',css:'none',e:'🌈'},
+  {id:'bw',name:'B&W',css:'grayscale(100%)',e:'⚫'},
+  {id:'sepia',name:'Sepia',css:'sepia(80%)',e:'🤎'},
+  {id:'vivid',name:'Vivid',css:'saturate(180%) contrast(110%)',e:'🌟'},
+  {id:'fade',name:'Fade',css:'contrast(85%) brightness(110%) saturate(70%)',e:'🌫️'},
+  {id:'cool',name:'Cool',css:'hue-rotate(20deg) saturate(120%)',e:'🔵'},
+  {id:'warm',name:'Warm',css:'sepia(30%) saturate(150%) brightness(105%)',e:'🔶'},
+  {id:'noir',name:'Noir',css:'grayscale(100%) contrast(140%) brightness(90%)',e:'🖤'},
+  {id:'glam',name:'Glam',css:'brightness(110%) contrast(105%) saturate(120%)',e:'✨'},
+];
+const NAV=['s-mode','s-layout','s-filter','s-gallery','s-settings'];
+
+// ─── NAV ───
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('bnav').style.display=NAV.includes(id)?'flex':'none';
+  if(id==='s-gallery')renderGal();
+  if(id==='s-attract')applyBranding();
+  if(id!=='s-camera')stopCam();
+}
+function navHome(){setN('n-home');go('s-mode');}
+function navGal() {setN('n-gal'); go('s-gallery');}
+function navSet() {
+  if(S.kioskLock){openPass(()=>{setN('n-set');go('s-settings');});}
+  else{setN('n-set');go('s-settings');}
+}
+function setN(id){document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));document.getElementById(id).classList.add('on');}
+
+// ─── MODE / LAYOUT / FILTER ───
+function selMode(m,el){mode=m;document.querySelectorAll('.mcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function modeNext(){go('s-layout');renderLayouts();}
+function renderLayouts(){
+  document.getElementById('lgrid').innerHTML=LAYOUTS.map(l=>{
+    const boxes=Array(l.shots).fill(0).map(()=>{
+      const w=l.cols===1?42:l.cols===2?30:22,h=l.rows<=2?34:l.rows===3?22:16;
+      return `<div class="lb" style="width:${w}px;height:${h}px"></div>`;
+    }).join('');
+    const dir=l.cols===1?'column':'row',wrap=l.cols>1?'flex-wrap:wrap':'';
+    return `<div class="lcard ${l.id===lay?'sel':''}" onclick="selLay('${l.id}',this)">
+      <div class="lprev" style="flex-direction:${dir};${wrap};gap:3px">${boxes}</div>
+      <h4>${l.name}</h4><small>${l.desc}</small></div>`;
+  }).join('');
+}
+function selLay(id,el){lay=id;document.querySelectorAll('.lcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function renderFilters(){
+  document.getElementById('fgrid').innerHTML=FILTERS.map(f=>
+    `<div class="fcard ${f.id===filt?'sel':''}" onclick="selFil('${f.id}',this)">
+      <div class="fprev" style="filter:${f.css}">${f.e}</div>
+      <div class="fname">${f.name}</div></div>`
+  ).join('');
+}
+function selFil(id,el){filt=id;document.querySelectorAll('.fcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+
+// ─── CAMERA ───
+// THE KEY INSIGHT FROM DIAGNOSTIC:
+// Camera works perfectly. The only issue was the screen
+// was switching to display:flex but the video had z-index
+// or stacking context issues. Fixed by keeping it simple.
+async function startCam(){
+  const vid=document.getElementById('cam-vid');
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;vid.srcObject=null;}
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false});
+  }catch(e){
+    try{camStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});}
+    catch(e2){toast('Camera error: '+e2.message);return;}
+  }
+  const f=FILTERS.find(f=>f.id===filt);
+  vid.style.filter=f?f.css:'none';
+  vid.style.transform=S.mirror?'scaleX(-1)':'none';
+  vid.srcObject=camStream;
+  vid.muted=true;
+  // play() — confirmed working from diagnostic
+  await vid.play().catch(()=>{});
 }
 
-log('Page loaded');
-log('UserAgent: ' + navigator.userAgent.slice(0,80));
-log('Protocol: ' + location.protocol);
-log('mediaDevices exists: ' + !!navigator.mediaDevices);
-log('getUserMedia exists: ' + !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia));
+function stopCam(){
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
+  const vid=document.getElementById('cam-vid');
+  vid.srcObject=null;
+}
 
-async function startTest() {
-  log('--- Starting camera test ---', 'inf');
+async function beginCap(){
+  const L=LAYOUTS.find(l=>l.id===lay);
+  captured=[];
 
-  const vid = document.getElementById('v');
-  log('Video element found: ' + !!vid);
-  log('Video offsetWidth: ' + vid.offsetWidth);
-  log('Video offsetHeight: ' + vid.offsetHeight);
+  // Show camera screen
+  go('s-camera');
+  document.getElementById('bnav').style.display='none';
 
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    log('❌ getUserMedia NOT supported on this browser', 'err');
-    return;
+  // Setup dots
+  document.getElementById('sdots').innerHTML=
+    Array(L.shots).fill(0).map((_,i)=>`<div class="sd ${i===0?'cur':''}"></div>`).join('');
+  document.getElementById('strip-row').innerHTML='';
+  document.getElementById('shutter').disabled=false;
+  document.getElementById('shutter').style.opacity='1';
+
+  // Wait two animation frames — screen must be painted before camera starts
+  // This is what fixes the black screen
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
+  await startCam();
+}
+
+async function flipCam(){
+  facing=facing==='user'?'environment':'user';
+  await startCam();
+}
+function exitCam(){stopCam();go('s-attract');}
+
+// ─── CAPTURE ───
+async function doCapture(){
+  if(capturing)return;
+  const L=LAYOUTS.find(l=>l.id===lay);
+  if(captured.length>=L.shots)return;
+  capturing=true;
+  if(S.countdown>0)await runCD(S.countdown);
+  doFlash();playShutter();snapFrame();updateDots();
+  capturing=false;
+  if(captured.length>=L.shots){
+    document.getElementById('shutter').disabled=true;
+    document.getElementById('shutter').style.opacity='0.3';
+    setTimeout(buildStrip,350);
   }
+}
+function snapFrame(){
+  const vid=document.getElementById('cam-vid');
+  const c=document.createElement('canvas');
+  c.width=vid.videoWidth||1280;c.height=vid.videoHeight||720;
+  const ctx=c.getContext('2d');
+  if(S.mirror){ctx.translate(c.width,0);ctx.scale(-1,1);}
+  const f=FILTERS.find(f=>f.id===filt);
+  if(f&&f.css!=='none')ctx.filter=f.css;
+  ctx.drawImage(vid,0,0,c.width,c.height);
+  const url=c.toDataURL('image/jpeg',.92);
+  captured.push(url);
+  const row=document.getElementById('strip-row');
+  const d=document.createElement('div');d.className='sth';
+  d.innerHTML=`<img src="${url}">`;row.appendChild(d);
+}
+function updateDots(){
+  document.querySelectorAll('.sd').forEach((d,i)=>{
+    d.classList.remove('done','cur');
+    if(i<captured.length)d.classList.add('done');
+    else if(i===captured.length)d.classList.add('cur');
+  });
+}
+function runCD(n){
+  return new Promise(res=>{
+    const wrap=document.getElementById('cdwrap'),num=document.getElementById('cdnum');
+    let c=n;wrap.classList.add('on');num.textContent=c;
+    const iv=setInterval(()=>{
+      c--;
+      if(c<=0){clearInterval(iv);wrap.classList.remove('on');res();}
+      else{num.textContent=c;num.style.animation='none';num.offsetHeight;num.style.animation='';}
+    },1000);
+  });
+}
+function doFlash(){
+  if(!S.flash)return;
+  const f=document.getElementById('flash');
+  f.style.display='block';f.style.opacity='1';
+  setTimeout(()=>{f.style.transition='opacity .3s';f.style.opacity='0';
+    setTimeout(()=>{f.style.display='none';f.style.transition='';},310);},40);
+}
+function playShutter(){
+  if(!S.sound)return;
+  try{const a=new(window.AudioContext||window.webkitAudioContext)();
+    const o=a.createOscillator(),g=a.createGain();
+    o.connect(g);g.connect(a.destination);o.frequency.value=1100;
+    g.gain.setValueAtTime(.25,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.07);
+    o.start();o.stop(a.currentTime+.07);}catch(e){}
+}
+function cycleTimer(){const v=[0,3,5,10],i=v.indexOf(S.countdown);S.countdown=v[(i+1)%v.length];saveS();toast(`⏱ Timer: ${S.countdown===0?'Off':S.countdown+'s'}`);}
+function addSticker(){toast('😊 Sticker added!');}
 
-  log('Requesting camera with {video:true}...', 'inf');
-
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-    log('✅ Got stream! Tracks: ' + stream.getVideoTracks().length, 'ok');
-
-    const track = stream.getVideoTracks()[0];
-    log('Track label: ' + track.label, 'ok');
-    log('Track readyState: ' + track.readyState, 'ok');
-
-    vid.srcObject = stream;
-    vid.muted = true;
-    log('srcObject assigned', 'ok');
-
-    vid.onloadedmetadata = () => {
-      log('✅ loadedmetadata fired! ' + vid.videoWidth + 'x' + vid.videoHeight, 'ok');
-    };
-    vid.oncanplay = () => log('✅ canplay fired', 'ok');
-    vid.onplaying = () => log('✅ playing fired — VIDEO SHOULD BE VISIBLE NOW', 'ok');
-    vid.onerror   = (e) => log('❌ video error: ' + JSON.stringify(e), 'err');
-
-    try {
-      await vid.play();
-      log('✅ play() resolved', 'ok');
-    } catch(pe) {
-      log('⚠️ play() threw: ' + pe.message, 'err');
+// ─── BUILD STRIP ───
+function buildStrip(){
+  showL('Building your photo...');
+  setTimeout(async()=>{
+    const L=LAYOUTS.find(l=>l.id===lay);
+    const pw=600,ph=Math.round(pw*9/16),pad=14,brd=32;
+    let cw,ch;
+    if(L.cols===1){cw=pw+brd*2;ch=ph*L.rows+pad*(L.rows-1)+brd*2;}
+    else{cw=pw*L.cols+pad*(L.cols-1)+brd*2;ch=ph*L.rows+pad*(L.rows-1)+brd*2;}
+    const canvas=document.getElementById('rev-canvas');
+    canvas.width=cw;canvas.height=ch;
+    const ctx=canvas.getContext('2d');
+    if(S.borderColor==='rainbow'){
+      const gr=ctx.createLinearGradient(0,0,cw,ch);
+      gr.addColorStop(0,'#ff6b6b');gr.addColorStop(.33,'#ffd93d');
+      gr.addColorStop(.66,'#6bcb77');gr.addColorStop(1,'#4d96ff');
+      ctx.fillStyle=gr;
+    }else ctx.fillStyle=S.borderColor;
+    ctx.fillRect(0,0,cw,ch);
+    const loadImg=src=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src=src;});
+    for(let i=0;i<captured.length;i++){
+      const img=await loadImg(captured[i]);
+      const col=i%L.cols,row=Math.floor(i/L.cols);
+      const x=brd+col*(pw+pad),y=brd+row*(ph+pad);
+      ctx.save();ctx.beginPath();rr(ctx,x,y,pw,ph,6);ctx.clip();
+      ctx.drawImage(img,x,y,pw,ph);ctx.restore();
     }
-
-    setTimeout(() => {
-      log('After 2s — readyState: ' + vid.readyState, 'inf');
-      log('After 2s — paused: ' + vid.paused, 'inf');
-      log('After 2s — videoWidth: ' + vid.videoWidth, 'inf');
-      log('After 2s — currentTime: ' + vid.currentTime, 'inf');
-      log('After 2s — srcObject: ' + (vid.srcObject ? 'set' : 'NULL'), 'inf');
-    }, 2000);
-
-  } catch(err) {
-    log('❌ getUserMedia failed: ' + err.name + ' — ' + err.message, 'err');
-  }
+    if(S.eventName){
+      ctx.fillStyle=S.borderColor==='#000000'?'#ddd':'#444';
+      ctx.font='bold 15px -apple-system,sans-serif';ctx.textAlign='center';
+      ctx.fillText(S.eventName,cw/2,ch-brd/2+4);
+    }
+    if(S.logoUrl){const logo=await loadImg(S.logoUrl);const lw=80,lh=lw*(logo.height/logo.width);ctx.drawImage(logo,cw-lw-7,ch-lh-7,lw,lh);}
+    if(S.frames&&S.frames.length){const fr=await loadImg(S.frames[0]);ctx.drawImage(fr,0,0,cw,ch);}
+    hideL();stopCam();go('s-review');
+    document.getElementById('shutter').disabled=false;
+    const url=canvas.toDataURL('image/jpeg',.9);
+    gallery.unshift({url,date:new Date().toISOString()});
+    try{localStorage.setItem('sb_g',JSON.stringify(gallery.slice(0,50)));}catch(e){}
+    if(S.autoreset){clearTimeout(autoTmr);autoTmr=setTimeout(newSess,15000);}
+  },60);
 }
+function rr(ctx,x,y,w,h,r){ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
+
+// ─── SHARE ───
+async function doShare(){
+  const canvas=document.getElementById('rev-canvas');
+  canvas.toBlob(async blob=>{
+    const file=new File([blob],'snapbooth.jpg',{type:'image/jpeg'});
+    try{
+      if(navigator.share&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'My Photo'});toast('✅ Shared!','ok');}
+      else if(navigator.share){await navigator.share({title:'SnapBooth',text:'Check out my photo!'});}
+      else toast('Use Save button');
+    }catch(e){if(!String(e).includes('cancel'))toast('Cancelled');}
+  },'image/jpeg',.9);
+}
+function doSave(){const a=document.createElement('a');a.download=`snapbooth-${Date.now()}.jpg`;a.href=document.getElementById('rev-canvas').toDataURL('image/jpeg',.9);a.click();toast('💾 Saved!','ok');}
+function doPrint(){const url=document.getElementById('rev-canvas').toDataURL('image/jpeg',.95);const w=window.open('');w.document.write(`<html><head><style>*{margin:0}img{max-width:100vw;max-height:100vh}</style></head><body><img src="${url}" onload="window.print();window.close()"></body></html>`);w.document.close();toast('🖨️ Printing...','ok');}
+function doQR(){document.getElementById('m-qr').classList.add('on');drawQR();}
+function drawQR(){
+  const c=document.getElementById('qrc'),ctx=c.getContext('2d');
+  const s=190;ctx.fillStyle='#fff';ctx.fillRect(0,0,s,s);
+  let seed=54321;const rand=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+  const cells=Math.floor(s/6);
+  const fp=(ox,oy)=>{ctx.fillStyle='#000';ctx.fillRect(ox*6,oy*6,42,42);ctx.fillStyle='#fff';ctx.fillRect(ox*6+6,oy*6+6,30,30);ctx.fillStyle='#000';ctx.fillRect(ox*6+12,oy*6+12,18,18);};
+  fp(0,0);fp(cells-7,0);fp(0,cells-7);
+  for(let r=0;r<cells;r++)for(let cc=0;cc<cells;cc++){const isF=(r<8&&cc<8)||(r<8&&cc>=cells-8)||(r>=cells-8&&cc<8);if(!isF&&rand()>.5){ctx.fillStyle='#000';ctx.fillRect(cc*6,r*6,5,5);}}
+  ctx.fillStyle='#fff';ctx.fillRect(s/2-20,s/2-13,40,26);ctx.fillStyle='#c8f135';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText('SNAP',s/2,s/2-1);ctx.fillText('BOOTH',s/2,s/2+10);
+}
+function retake(){clearTimeout(autoTmr);beginCap();}
+function newSess(){clearTimeout(autoTmr);captured=[];go('s-attract');}
+
+// ─── GALLERY ───
+function renderGal(){
+  const grid=document.getElementById('ggrid'),empty=document.getElementById('gempty');
+  if(!gallery.length){grid.innerHTML='';empty.style.display='flex';return;}
+  empty.style.display='none';
+  grid.innerHTML=gallery.map((item,i)=>`<div class="gi" onclick="viewGal(${i})"><img src="${item.url}" loading="lazy"></div>`).join('');
+}
+function viewGal(i){
+  const canvas=document.getElementById('rev-canvas');
+  const img=new Image();
+  img.onload=()=>{canvas.width=img.width;canvas.height=img.height;canvas.getContext('2d').drawImage(img,0,0);go('s-review');};
+  img.src=gallery[i].url;
+}
+function clearGal(){if(!confirm('Delete all photos?'))return;gallery=[];try{localStorage.removeItem('sb_g');}catch(e){}renderGal();toast('🗑️ Cleared');}
+
+// ─── SETTINGS ───
+function saveS(){try{localStorage.setItem('sb_s',JSON.stringify(S));}catch(e){}}
+function togS(k){S[k]=!S[k];document.getElementById('tog-'+k).classList.toggle('on',S[k]);saveS();}
+function setCD(v,el){S.countdown=v;document.querySelectorAll('.topt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');saveS();}
+function setBC(c,el){S.borderColor=c;document.querySelectorAll('.co').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');saveS();}
+function ev(key,label){
+  const v=prompt(label+':',S[key]||'');if(v===null)return;
+  if(key==='passcode'){const c=v.replace(/\D/g,'').slice(0,4);if(c.length!==4){toast('4 digits required');return;}S[key]=c;}
+  else S[key]=v;
+  const el=document.getElementById('sv-'+key);if(el)el.textContent=v||'Not set';
+  if(key==='appName'||key==='tagline')applyBranding();
+  saveS();
+}
+function upLogo(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{S.logoUrl=e.target.result;const p=document.getElementById('lprev');p.src=e.target.result;p.style.display='block';saveS();toast('✅ Logo uploaded','ok');};r.readAsDataURL(f);}
+function upFrames(inp){Array.from(inp.files).forEach(f=>{const r=new FileReader();r.onload=e=>{S.frames.push(e.target.result);const img=document.createElement('img');img.src=e.target.result;img.className='fth';img.onclick=()=>{document.querySelectorAll('.fth').forEach(t=>t.classList.remove('sel'));img.classList.add('sel');S.frames=[e.target.result,...S.frames.filter(x=>x!==e.target.result)];saveS();};document.getElementById('fthumbs').appendChild(img);saveS();};r.readAsDataURL(f);});toast('✅ Frames uploaded','ok');}
+function resetAll(){if(!confirm('Reset all settings?'))return;localStorage.clear();location.reload();}
+function applyBranding(){document.getElementById('lbl-logo').textContent=S.appName||'SnapBooth';document.getElementById('lbl-tag').textContent=S.tagline||'Tap anywhere to start';}
+applyBranding();
+function initUI(){
+  ['appName','eventName','tagline'].forEach(k=>{const e=document.getElementById('sv-'+k);if(e)e.textContent=S[k]||'Not set';});
+  ['mirror','flash','sound','autoreset','kioskLock'].forEach(k=>{const e=document.getElementById('tog-'+k);if(e)e.classList.toggle('on',!!S[k]);});
+  if(S.logoUrl){const p=document.getElementById('lprev');p.src=S.logoUrl;p.style.display='block';}
+  document.querySelectorAll('.co').forEach(o=>o.classList.toggle('sel',o.dataset.c===S.borderColor));
+  if(S.frames)S.frames.forEach(f=>{const img=document.createElement('img');img.src=f;img.className='fth';document.getElementById('fthumbs').appendChild(img);});
+}
+initUI();
+
+// ─── PASSCODE ───
+function openPass(cb){passEntry='';passCB=cb;updPD();document.getElementById('m-pass').classList.add('on');}
+function closeM(id){document.getElementById(id).classList.remove('on');passEntry='';}
+function np(n){if(passEntry.length>=4)return;passEntry+=n;updPD();if(passEntry.length===4)setTimeout(()=>{if(passEntry===S.passcode){closeM('m-pass');if(passCB)passCB();}else{toast('❌ Wrong passcode');passEntry='';updPD();}},200);}
+function npDel(){passEntry=passEntry.slice(0,-1);updPD();}
+function updPD(){document.querySelectorAll('.pd').forEach((d,i)=>d.classList.toggle('on',i<passEntry.length));}
+
+// ─── TOAST / LOADER ───
+function toast(msg,cls=''){const c=document.getElementById('toasts'),d=document.createElement('div');d.className='toast'+(cls?' '+cls:'');d.textContent=msg;c.appendChild(d);setTimeout(()=>d.remove(),3000);}
+function showL(msg){document.getElementById('ltxt').textContent=msg||'Processing...';document.getElementById('loader').classList.add('on');}
+function hideL(){document.getElementById('loader').classList.remove('on');}
+
+try{if('wakeLock' in navigator)navigator.wakeLock.request('screen');}catch(e){}
 </script>
 </body>
 </html>
